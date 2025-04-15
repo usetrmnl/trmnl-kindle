@@ -125,8 +125,7 @@ Run the Hotfix after every OTA update.
 ## Install KUAL and MRPI
 
 ### 13. Download KUAL and MRPI
-- Download MRPI and KUAL: [KUAL-MRPI](https://fw.notmarek.com/khf/kual-mrinstaller-khf.tar.xz)
-- Provided by Marek: [More info](https://fw.notmarek.com/khf/)
+- Download MRPI and KUAL: [KUAL-MRPI](https://fw.notmarek.com/khf/kual-mrinstaller-khf.tar.xz), provided by Marek: [More info](https://fw.notmarek.com/khf/)
 
 ### 14. Choose Correct KUAL Version
 - **Newer Kindles (post-2012):** [KUAL Coplate](https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/Update_KUALBooklet_ALLDEVICES_KS2_install.bin)
@@ -136,18 +135,23 @@ Run the Hotfix after every OTA update.
 - Extract MRPI, copying the `extensions` and `mrpackages` folders to Kindle.
 - Extract KUAL and copy the `.bin` file into Kindle's `mrpackages` folder.
 
-![Extracting MRPI](https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/mrpackages_extensions_folders.png)
-![Extracting KUAL](https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/kual_install_bin.png)
+**extracting MRPI**
+
+<kdb><img src="https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/mrpackages_extensions_folders.png" width="500px"></kdb>
+
+**extracting KUAL**
+
+<kdb><img src="https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/kual_install_bin.png" width="500px"></kdb>
 
 ### 16. Eject and Disconnect Kindle
-Safely eject and unplug your Kindle.
+Safely eject (disconnect) and unplug your Kindle.
 
-![Eject](https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/eject.png)
+<kdb><img src="https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/eject.png" width="350px"></kdb>
 
 ### 17. Run MRPI
-Run MRPI by typing `;log mrpi` into the search bar and press enter.
+Run MRPI by typing `;log mrpi` into the search bar and pressing enter. Nothing will happen for a few seconds, then your device screen may go blank.
 
-![Run Dispatch](https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/run_dispatch.png)
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/run-mrpi.jpeg" width="650px"></kdb>
 
 ### 18. Complete KUAL Installation
 Wait until installation completes and **KUAL book** appears in your library.
