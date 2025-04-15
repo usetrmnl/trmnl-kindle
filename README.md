@@ -1,27 +1,21 @@
 # Turn Your Amazon Kindle into a TRMNL
 
-This guide explains how to jailbreak your Kindle using WinterBreak, then connect it to  a TRMNL device.
+This guide explains how to jailbreak your Kindle using WinterBreak, then convert it into a personal dashboard with TRMNL.
 
 ## Prerequisites
 - A PC/Mac
-- TRMNL API key (physical device or [BYOD license](https://shop.usetrmnl.com/products/byod))
+- TRMNL API key (physical device **or** [BYOD license](https://shop.usetrmnl.com/products/byod) **or** [BYOS client](https://docs.usetrmnl.com/go/diy/byos). No* purchase necessary.
 - Registered Kindle
-- Kindle connected to WiFi (Steps 8–10 require active internet)
+- Kindle connected to WiFi
+
+`*` - for a 100% free, DIY approach you need to modify our `TRMNL_KINDLE` Zip (Step 19 below) to point to your own server, which is currently beyond the scope of this guide. this code will also be made available.
 
 ## Introduction
-**WinterBreak** is a jailbreak released by **HackerDude** on **New Year’s Day 2025**. It's based on **Mesquito** and allows Kindle users to run custom applications like TRMNL.
+**[WinterBreak](https://kindlemodding.org/jailbreaking/WinterBreak/)** is a jailbreak released by **HackerDude** on **New Year’s Day 2025**. It's based on **Mesquito** and allows Kindle users to run custom applications like TRMNL. Special thanks to their many contributors and beta testers.
 
 **Note**: Mesquito does **NOT** work on Kindle firmware 5.18.1 and later. Open your Kindle's settings tray > All Settings > Device options > Device info to determine which version you're using. If newer than 5.18, roll back.
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-firmware-check.jpeg" width="500px"/></kdb>
-
-### Special Thanks
-- Marek
-- NiLuJe
-- Katadelos
-- All beta-testers
-
----
 
 ## Jailbreaking Steps
 
