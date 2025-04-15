@@ -4,7 +4,7 @@ This guide explains how to jailbreak your Kindle using WinterBreak, then convert
 
 ## Prerequisites
 - A PC/Mac
-- TRMNL API key (physical device **or** [BYOD license](https://shop.usetrmnl.com/products/byod) **or** [BYOS client](https://docs.usetrmnl.com/go/diy/byos). No* purchase necessary.
+- TRMNL API key (physical device **or** [BYOD license](https://shop.usetrmnl.com/products/byod) **or** [BYOD/S client](https://docs.usetrmnl.com/go/diy/byod-s). No* purchase necessary.
 - Registered Kindle
 - Kindle connected to WiFi
 
@@ -156,27 +156,44 @@ Run MRPI by typing `;log mrpi` into the search bar and pressing enter. Nothing w
 ### 18. Complete KUAL Installation
 Wait until installation completes and **KUAL book** appears in your library.
 
-*Note:* "Application Error" dialog may appear on some modern Kindles; this is normal.
+**Note**: an "Application Error" dialog may appear; this is normal.
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/complete-kual-installation.jpeg" width="800px"></kdb>
 
 ## Install TRMNL
 
 ### 19. Download TRMNL KUAL Package
-FIXME: Download: [TRMNL_KINDLE.zip - https://usetrmnl.com/devices/5831/kindle/TRMNL_KINDLE.zip](https://usetrmnl.com/devices/5831/kindle/TRMNL_KINDLE.zip)
+Download your TRMNL KUAL package. Log into usetrmnl.com and find your Device ID by navigating to the top-right dropdown > clicking a device. Your Device ID will be in the URL, e.g. `1234`.
+
+Next, construct this URL and visit in a new tab:
+```
+https://usetrmnl.com/devices/<device-id>/kindle/TRMNL_KINDLE.zip
+```
+
+This will download a file, `TRMNL_KINDLE_<date>.zip`.
+
+**Troubleshooting**
+
+Soon we'll release all source code to help you build your own `*.zip` file for a [BYOD/S](https://docs.usetrmnl.com/go/diy/byod-s) client. No TRMNL account or purchase is necessary to turn a Kindle into a TRMNL, but you will have to deploy some code.
 
 ### 20. Unzip TRMNL Package
+Do this on your computer.
 
-### 21. Connect Kindle to PC
+### 21. Connect Kindle to computer
+Connect USB and enter drag/drop mode.
 
 ### 22. Copy TRMNL to Kindle
-Copy the `TRMNL_KINDLE` folder to Kindle’s `extensions` folder.
+Copy the `TRMNL_KINDLE` folder to Kindle’s `extensions` folder. It may be named TRMNL_KINDLE_20250415 with a datestamp at the end. 
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-extension.png" width="500px"></kdb>
 
 ### 23. Disconnect Kindle
-Safely eject and disconnect your Kindle.
+Safely eject (disconnect) your Kindle.
 
 ### 24. Open KUAL
-Launch KUAL from your library.
-![Launch KUAL from your library](https://files.littlebird.com.au/IMG_2455_e.jpeg)
+Launch KUAL from your Kindle library.
 
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-kual-app.jpeg" width="500px"></kdb>
 
 ### 25. Start TRMNL
 - Press the **TRMNL** button.
