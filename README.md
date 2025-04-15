@@ -76,7 +76,15 @@ Click the **WinterBreak icon** after the Kindle store reloads.
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-mesquito.jpeg" width="400px"></kdb>
 
-If you don't see this, follow [these steps](https://kindlemodding.org/jailbreaking/WinterBreak/#kindle-store-encountered-an-unexpected-error) to factory reset, drag/drop Winterbreak files before* signing into Amazon, delete the LocalStorage folder if exists, etc. While building this TRMNL jailbreak guide we experienced both scenarios with different Kindle devices.
+If you don't see this, follow [these steps](https://kindlemodding.org/jailbreaking/WinterBreak/#kindle-store-encountered-an-unexpected-error) to factory reset, drag/drop Winterbreak files before* signing into Amazon, delete the LocalStorage folder if exists, etc. While building this TRMNL jailbreak guide we experienced both scenarios with different Kindle devices. Also delete `ku` and `mfa` folders if exist.
+
+**deleting KU, MFA folders**
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-ku-mfa-folders.png" width="400px"></kdb>
+
+**deleting LocalStorage folder**
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-active-content-sandbox-delete-localstorage.png" width="400px"></kdb>
 
 ### 7. Complete Jailbreak
 Wait ~30 seconds for the confirmation message ("Finished installing jailbreak"), then turn Airplane mode back on.
@@ -92,9 +100,9 @@ Download universal hotfix:
 **Important:** Uninstall OTARenamer if previously installed.
 
 ### 9. Copy Hotfix
-Connect Kindle to PC and copy `Update_hotfix_universal.bin`. Delete any other `.bin` files present.
+Connect Kindle to your computer and copy `Update_hotfix_universal.bin`. Delete any other `.bin` files present.
 
-![Copy Hotfix](https://kindlemodding.org/jailbreaking/post-jailbreak/setting-up-a-hotfix/copy_hotfix.png)
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-update-hotfix-universal-bin.png" width="400px"></kdb>
 
 ### 10. Install Hotfix
 - Eject Kindle.
