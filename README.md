@@ -37,13 +37,33 @@ From the same settings tray as Airplane Mode, click All Settings > Device option
 </div>
 
 ### 4. Extract WinterBreak
+ (incl Finder screenshot here, from Ryan's macbook. also include "Send to kindle" success modal after native app installation). If you do have to install the app, make sure to open it up after installation. It will look like this (incl 2x more mac screenshots) 
+
 - After reboot, connect Kindle to PC.
-- Extract `WinterBreak.tar.gz` on your PC first, then copy files to Kindle.
-- For Linux/Mac users, ensure `.active_content_sandbox` folder is also copied.
+- Extract `WinterBreak.tar.gz` on your computer, then copy all enclosed files to Kindle.
+- For Linux/Mac users, ensure `.active_content_sandbox` folder is also copied. See troubleshooting below for help accomplishing this.
 
 Replace files if prompted.
 
 <kbd><img src="https://kindlemodding.org/jailbreaking/WinterBreak/file_list.png" width="650px"/></kbd>
+
+**Troubleshooting (Mac) - Kindle doesn't appear connected**
+
+If you connected the Kindle via USB but don't see it, install the [ConnectMyKindle](https://www.amazon.com/ConnectMyKindle) app.
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-finder-doesnt-appear.png" width="400px"></kdb>
+
+Open the app, then click "Open USB File Manager" in the top right. The default app will not work.
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/send-to-kindle-app.png" width="400px"></kdb>
+
+Drag all files from the extracted WinterBreak folder:
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/winterbreak-drag-drop-usb-window.jpeg" width="400px"></kdb>
+
+To ensure the hidden `.active_content_sandbox` content is also copied, open the hidden folder from your terminal and then drag/drop the `store` directory into the Kindle's existing `.active_content_sandbox` directory.
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/winterbreak-copy-store-directory.jpeg"></kdb>
 
 ### 5. Enter Mesquito
 - Eject Kindle.
