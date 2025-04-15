@@ -105,22 +105,22 @@ Connect Kindle to your computer and copy `Update_hotfix_universal.bin`. Delete a
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-update-hotfix-universal-bin.png" width="400px"></kdb>
 
 ### 10. Install Hotfix
-- Eject Kindle.
-- Go to **Settings → Three dots → Update Your Kindle**.
+- Eject/Disconnect Kindle from your computer.
+- Open the settings tray > All Settings → Three dots → Update Your Kindle.
 
-![Update Settings](https://kindlemodding.org/jailbreaking/post-jailbreak/setting-up-a-hotfix/update_settings.png)
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-settings-update-kindle.jpeg" width="600px"></kdb>
 
 ### 11. Confirm Hotfix Install
 Confirm when asked to update.
 
-![Update Dialog](https://kindlemodding.org/jailbreaking/post-jailbreak/setting-up-a-hotfix/update_dialog.png)
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-confirm-hotfix-modal.jpeg" width="600px"></kdb>
 
 ### 12. Run Hotfix
-After installation, run the Hotfix by opening **Run Hotfix** or **Run Bridge** from your library.
+After installation, run the Hotfix by opening **Run Hotfix** or **Run Bridge** from your Kindle library. It will say "opening" for several seconds, then should switch to restarting your device, with a progress bar.
 
 Run the Hotfix after every OTA update.
 
-![Run Hotfix](https://kindlemodding.org/jailbreaking/post-jailbreak/setting-up-a-hotfix/run_hotfix.png)
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/run-hotfix-progress-bar.jpeg" width="600px"></kdb>
 
 ## Install KUAL and MRPI
 
