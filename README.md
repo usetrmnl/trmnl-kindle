@@ -2,6 +2,10 @@
 
 This guide explains how to jailbreak your Kindle using WinterBreak, then convert it into a personal dashboard with TRMNL.
 
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-alpha-release.jpeg" width="650px"></kdb>
+
+As of April 15, 2025 **this is an alpha release**. Issues and PRs are welcome. Tested on 10th gen, 12th gen Kindle e-ink displays.
+
 ## Prerequisites
 - A PC/Mac
 - TRMNL API key (physical device **or** [BYOD license](https://shop.usetrmnl.com/products/byod) **or** [BYOD/S client](https://docs.usetrmnl.com/go/diy/byod-s). No* purchase necessary.
@@ -196,9 +200,21 @@ Launch KUAL from your Kindle library.
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-kual-app.jpeg" width="500px"></kdb>
 
 ### 25. Start TRMNL
-- Press the **TRMNL** button.
-![Launch KUAL from your library](https://files.littlebird.com.au/IMG_2456_e.jpeg)
-- Select **Start TRMNL**.
-![Launch KUAL from your library](https://files.littlebird.com.au/IMG_2457_e.jpeg)
+- Press the **TRMNL** button, then select **Start TRMNL**.
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kual-trmnl-app.jpeg" width="650px"></kdb>
+
 Your Kindle is now successfully running TRMNL!
-![successfully running TRMNL!](https://files.littlebird.com.au/IMG_2458.jpg)
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-alpha-release.jpeg" width="650px"></kdb>
+
+**Troubleshooting JSON error**
+You may see an error, such as `Fetching JSON... error.. Retry in 60s.` This likely means you are still in Airplane Mode. Disble Airplane Mode, then re-open KUAL > TRMNL > Start TRMNL.
+
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-json-fetch-error.jpeg" width="650px"></kdb>
+
+## Next steps
+
+Our team is working to accommodate multiple Kindle device frame dimensions, open source more the TRMNL_KINDLE jailbreak logic for easy extension, and handle Kindle device "sleep" screens + redraws.
+
+Issues and PRs welcome!
