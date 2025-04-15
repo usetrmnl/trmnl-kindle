@@ -66,20 +66,22 @@ To ensure the hidden `.active_content_sandbox` content is also copied, open the 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/winterbreak-copy-store-directory.jpeg"></kdb>
 
 ### 5. Enter Mesquito
-- Eject Kindle.
-- Open Kindle Store and confirm to turn off Airplane mode when prompted.
+- Eject your Kindle by clicking "Disconnect" on the device screen.
+- Open the Kindle Store by clicking the cart icon and turn Airplane Mode back "off" when prompted.
 
-<kbd><img src="https://kindlemodding.org/jailbreaking/WinterBreak/store_aeroplane.png" width="650px"/></kbd>
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-store-airplane-mode-prompt.jpeg" width="400px"></kdb>
 
 ### 6. Run WinterBreak
-Click the **WinterBreak icon** after store loads.
+Click the **WinterBreak icon** after the Kindle store reloads.
 
-![WinterBreak Launcher](https://kindlemodding.org/jailbreaking/WinterBreak/winterbreak_launcher.png)
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-mesquito.jpeg" width="400px"></kdb>
+
+If you don't see this, follow [these steps](https://kindlemodding.org/jailbreaking/WinterBreak/#kindle-store-encountered-an-unexpected-error) to factory reset, drag/drop Winterbreak files before* signing into Amazon, delete the LocalStorage folder if exists, etc. While building this TRMNL jailbreak guide we experienced both scenarios with different Kindle devices.
 
 ### 7. Complete Jailbreak
-Wait ~30 seconds for confirmation message, then turn Airplane mode back on.
+Wait ~30 seconds for the confirmation message ("Finished installing jailbreak"), then turn Airplane mode back on.
 
-![WinterBreak Run](https://kindlemodding.org/jailbreaking/WinterBreak/winterbreak_run.png)
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-jailbreak-conirmation-message.jpeg" width="400px"></kdb>
 
 ## Post-Jailbreak Hotfix
 
