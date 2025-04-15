@@ -13,7 +13,7 @@ This guide explains how to jailbreak your Kindle using WinterBreak, then connect
 
 **Note**: Mesquito does **NOT** work on Kindle firmware 5.18.1 and later. Open your Kindle's settings tray > All Settings > Device options > Device info to determine which version you're using. If newer than 5.18, roll back.
 
-[INSERT - KINDLE FW VERSION PIC]
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-firmware-check.jpeg" width="500px"/></kdb>
 
 ### Special Thanks
 - Marek
@@ -30,14 +30,17 @@ Download the latest WinterBreak:
 - [WinterBreak.tar.gz](https://github.com/KindleModding/WinterBreak/releases/latest/download/WinterBreak.tar.gz)
 
 ### 2. Airplane Mode
-Turn on **Airplane Mode** on your Kindle.
+Turn on **Airplane Mode** on your Kindle. Swipe down or tap the battery icon in the top right corner to access the tray.
 
-![Airplane Mode](https://kindlemodding.org/jailbreaking/WinterBreak/airplane_mode.png)
+<kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-airplane-mode-enabled.jpeg" width="500px"/></kdb>
 
-### 3. Reboot Kindle
-Restart your Kindle.
+### 3. Restart Kindle
+From the same settings tray as Airplane Mode, click All Settings > Device options >  Restart. Pending your Kindle device and firmware, you may see either modal option below.
 
-![Reboot](https://kindlemodding.org/jailbreaking/WinterBreak/reboot.png)
+<div align="center">
+  <kbd><img src="https://kindlemodding.org/jailbreaking/WinterBreak/reboot.png" width="350px"/></kbd>
+  <kbd><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-paperwhite-restart-modal.jpeg" width="350px"/></kbd>
+</div>
 
 ### 4. Extract WinterBreak
 - After reboot, connect Kindle to PC.
@@ -46,13 +49,13 @@ Restart your Kindle.
 
 Replace files if prompted.
 
-![File List](https://kindlemodding.org/jailbreaking/WinterBreak/file_list.png)
+<kbd><img src="https://kindlemodding.org/jailbreaking/WinterBreak/file_list.png" width="650px"/></kbd>
 
 ### 5. Enter Mesquito
 - Eject Kindle.
 - Open Kindle Store and confirm to turn off Airplane mode when prompted.
 
-![Store Airplane](https://kindlemodding.org/jailbreaking/WinterBreak/store_aeroplane.png)
+<kbd><img src="https://kindlemodding.org/jailbreaking/WinterBreak/store_aeroplane.png" width="650px"/></kbd>
 
 ### 6. Run WinterBreak
 Click the **WinterBreak icon** after store loads.
