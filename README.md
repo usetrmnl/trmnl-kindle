@@ -35,7 +35,7 @@ Turn on **Airplane Mode** on your Kindle. Swipe down or tap the battery icon in 
 ### 3. Restart Kindle
 From the same settings tray as Airplane Mode, click All Settings > Device options >  Restart. Pending your Kindle device and firmware, you may see either modal option below.
 
-<div align="center">
+<div class="flex">
   <kbd><img src="https://kindlemodding.org/jailbreaking/WinterBreak/reboot.png" width="350px"/></kbd>
   <kbd><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-paperwhite-restart-modal.jpeg" width="350px"/></kbd>
 </div>
