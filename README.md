@@ -41,7 +41,6 @@ From the same settings tray as Airplane Mode, click All Settings > Device option
 </div>
 
 ### 4. Extract WinterBreak
- (incl Finder screenshot here, from Ryan's macbook. also include "Send to kindle" success modal after native app installation). If you do have to install the app, make sure to open it up after installation. It will look like this (incl 2x more mac screenshots) 
 
 - After reboot, connect Kindle to PC.
 - Extract `WinterBreak.tar.gz` on your computer, then copy all enclosed files to Kindle.
