@@ -9,7 +9,7 @@ As of April 15, 2025 **this is an alpha release**. Issues and PRs are welcome. T
 ## Prerequisites
 - A PC/Mac
 - TRMNL API key (physical device **or** [BYOD license](https://shop.usetrmnl.com/products/byod) **or** [BYOD/S client](https://docs.usetrmnl.com/go/diy/byod-s). No* purchase necessary.
-- Registered Kindle
+- Registered Kindle (5th gen or later)
 - Kindle connected to WiFi
 
 `*` - for a 100% free, DIY approach you need to modify our `TRMNL_KINDLE` Zip (Step 19 below) to point to your own server, which is currently beyond the scope of this guide. this code will also be made available.
