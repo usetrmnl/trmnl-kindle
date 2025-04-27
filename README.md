@@ -166,14 +166,17 @@ Wait until installation completes and **KUAL book** appears in your library.
 ## Install TRMNL
 
 ### 19. Download TRMNL KUAL Package
-Download your TRMNL KUAL package. Log into usetrmnl.com and find your Device ID by navigating to the top-right dropdown > clicking a device. Your Device ID will be in the URL, e.g. `1234`.
-
-Next, construct this URL and visit in a new tab:
+Log into usetrmnl.com and navigate to your device's settings page via Dashboards > top-right menu (should show a device name) > gear icon to the right of your device. The URL of the settings page should look something like this:
 ```
-https://usetrmnl.com/devices/<device-id>/kindle/TRMNL_KINDLE.zip
+https://usetrmnl.com/devices/<device-number>/edit
 ```
 
-This will download a file, `TRMNL_KINDLE_<date>.zip`.
+Use the device number in this URL (which is different than your device ID) to construct a URL like the one below, and navigate to it in a new tab:
+```
+https://usetrmnl.com/devices/<device-number>/kindle/TRMNL_KINDLE.zip
+```
+
+This will download a file: `TRMNL_KINDLE_<date>.zip`.
 
 **Troubleshooting**
 
