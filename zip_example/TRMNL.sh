@@ -55,6 +55,56 @@ eips_debug() {
   fi
 }
 
+# Function: json
+# Description: Extracts the value of a specified field from a JSON string using sed.
+# Parameters:
+#   $1: The JSON string (must be a valid JSON string).
+#   $2: The name of the field to extract.
+# Returns:
+#   The value of the specified field from the JSON string.
+#   If the field is not found or the JSON is invalid, it prints an error message to stderr and returns an empty string.
+#
+# Limitations:
+#   -  Uses sed, which is not a full JSON parser.  It works for simple key-value string extraction.
+#   -  Assumes string field value is a string enclosed in double quotes.
+#   -  Will not handle nested JSON structures or arrays reliably.
+#   -  Does not handle escaped quotes or other complex JSON string content robustly.
+#   -  Relies on pattern matching, which can be fragile with complex or unpredictable JSON.
+json() {
+  local json_string="$1"
+  local field_name="$2"
+
+  if [ -z "$json_string" ] || [ -z "$field_name" ]; then
+    echo "Error: json function requires both a JSON string and a field name." >&2
+    return 1
+  fi
+
+  local extracted_value
+  extracted_value=$(echo "$json_string" | sed -n "s/.*\"$field_name\": *\"\\([^\"]*\\)\".*/\\1/p")
+
+  if [ -z "$extracted_value" ]; then
+    extracted_value=$(echo "$json_string" | sed -n "s/.*\"$field_name\": *\\([0-9]*\\).*/\\1/p")
+    if [ -z "$extracted_value" ]; then
+      echo "Error: Field '$field_name' not found in JSON string." >&2
+      return 1
+    fi
+  else
+    # Unescape common JSON escape sequences.  This is still basic.
+    local unescaped_value
+    unescaped_value=$(echo "$extracted_value" \
+      | sed 's/\\\\/\\/g;
+             s/\\\"/\"/g;
+             s/\\\//\//g;
+             s/\\u0026/\&/g;
+             s/\\u0022/\"/g;'
+    )
+    extracted_value="$unescaped_value"
+  fi
+  echo "$extracted_value"
+  return 0
+}
+
+
 while true; do
   # Clear the screen only if in debug mode, otherwise clear right before displaying the image
   if [ "$DEBUG_MODE" = true ]; then
@@ -91,30 +141,28 @@ while true; do
   SHORT_JSON="$(echo "$RESPONSE" | cut -c1-60)"
   eips_debug "JSON: ${SHORT_JSON}..."
 
-  # 3) Parse JSON (naive sed approach)
-  IMAGE_URL=$(echo "$RESPONSE" | sed -n 's/.*"image_url":"\([^"]*\)".*/\1/p')
-  eips_debug "ORIGINAL_URL: ${IMAGE_URL}"
-
-  REFRESH_RATE=$(echo "$RESPONSE" | sed -n 's/.*"refresh_rate":\([^,}]*\).*/\1/p')
-  [ -z "$REFRESH_RATE" ] && REFRESH_RATE="60"
-
-  # Quick check for missing URL
+  # 3) Parse JSON (using the json function)
+  IMAGE_URL=$(json "$RESPONSE" "image_url")
   if [ -z "$IMAGE_URL" ]; then
-    eips_debug "Error: Unable to parse image_url from JSON."
+    eips_debug "Error: Failed to extract image_url from JSON."
     eips_debug "Retry in 60s..."
     sleep 60
     continue
   fi
+  eips_debug "ORIGINAL_URL: ${IMAGE_URL}"
 
-  # --- Extract filename directly from the top-level JSON field if present ---
-  FILENAME=$(echo "$RESPONSE" | sed -n 's/.*"filename":"\([^"]*\)".*/\1/p')
+  REFRESH_RATE=$(json "$RESPONSE" "refresh_rate")
+  if [ -z "$REFRESH_RATE" ]; then
+    REFRESH_RATE="60"
+  fi
+  eips_debug "Refresh Rate: ${REFRESH_RATE}"
 
-  # If the JSON has no "filename" field or is empty, try extracting from the URL
+  FILENAME=$(json "$RESPONSE" "filename")
   if [ -z "$FILENAME" ]; then
-    # Try to get filename from URL path
-    FILENAME=$(echo "$IMAGE_URL" | sed -n 's/.*\/\([^?/]*\)\?.*/\1/p')
-    # If that fails too, use default
-    [ -z "$FILENAME" ] && FILENAME="display.png"
+    FILENAME=$(echo "$IMAGE_URL" | sed -n 's/.*\/\([^?] *\)?.*/\1/p')
+    if [ -z "$FILENAME" ]; then
+      FILENAME="display.png"
+    fi
   fi
 
   # Make sure it ends with .png for eips
@@ -127,15 +175,12 @@ while true; do
   eips_debug "Parsed File: $FILENAME"
   eips_debug "Refresh: ${REFRESH_RATE}s"
 
-  # 4) Download the image via the proxy endpoint using POST with full JSON
+  # 4) Download the image directly
   IMAGE_PATH="$TMP_DIR/$FILENAME"
-  rm -f "$IMAGE_PATH"
+  rm -f "$IMAGE_PATH" #remove the file if it exists
   eips_debug "Downloading image..."
 
-  # Download the image directly from IMAGE_URL
-  curl -s -o "$IMAGE_PATH" \
-    -A "$USER_AGENT" \
-    "$IMAGE_URL"
+  curl -s -o "$IMAGE_PATH" -A "$USER_AGENT" "$IMAGE_URL"
 
   # Check download success
   if [ ! -s "$IMAGE_PATH" ]; then
@@ -143,6 +188,16 @@ while true; do
     eips_debug "Retry in 60s..."
     sleep 60
     continue
+  fi
+
+  # Check if the downloaded file is an XML (error check)
+  if head -n1 "$IMAGE_PATH" | grep -q '^\s*<?xml'; then
+    ERROR_MESSAGE=$(sed -n 's,.*<Message>\(.*\)</Message>.*,\1,p' "$IMAGE_PATH")
+    eips_debug "Error page: $ERROR_MESSAGE" >&2
+    eips_debug "File: $IMAGE_PATH"
+    eips_debug "Exiting in 5s..."
+    sleep 5
+    exit 1
   fi
 
   eips_debug "Image downloaded OK."
