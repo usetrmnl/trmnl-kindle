@@ -182,23 +182,27 @@ Soon we'll release all source code to help you build your own `*.zip` file for a
 ### 20. Unzip TRMNL Package
 Do this on your computer.
 
-### 21. Connect Kindle to computer
+### 21. Create a new file in the TRMNL_KINDLE folder apikey.txt
+Login to your TRMNL account and grab the API Key associted with your BYOD license
+Create a new file called `apikey.txt` in the `TRMNL_KINDLE` directory that only has your API Key in it
+
+### 22. Connect Kindle to computer
 Connect USB and enter drag/drop mode.
 
-### 22. Copy TRMNL to Kindle
+### 23. Copy TRMNL to Kindle
 Copy the `TRMNL_KINDLE` folder to Kindle’s `extensions` folder. It may be named TRMNL_KINDLE_20250415 with a datestamp at the end. 
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-extension.png" width="500px"></kdb>
 
-### 23. Disconnect Kindle
+### 24. Disconnect Kindle
 Safely eject (disconnect) your Kindle.
 
-### 24. Open KUAL
+### 25. Open KUAL
 Launch KUAL from your Kindle library.
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-kual-app.jpeg" width="500px"></kdb>
 
-### 25. Start TRMNL
+### 26. Start TRMNL
 - Press the **TRMNL** button, then select **Start TRMNL**.
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kual-trmnl-app.jpeg" width="650px"></kdb>
