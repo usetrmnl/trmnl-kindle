@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "name": "TRMNL",
+      "priority": -10,
+      "items": [
+        {
+          "name": "Start TRMNL",
+          "priority": 100,
+          "action": "./TRMNL.sh"
+        }
+      ]
+    }
+  ]
+}
