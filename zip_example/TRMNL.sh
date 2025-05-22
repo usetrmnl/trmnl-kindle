@@ -1,4 +1,6 @@
 #!/bin/sh
+source ./utils.sh
+
 ###############################################################################
 # TRMNL.sh
 #
@@ -13,9 +15,8 @@
 ###############################################################################
 #
 # ----------------------------- USER SETTINGS -------------------------------- #
-API_KEY="INSERT_DEVICE_API_KEY"
+API_KEY=$(cat apikey.txt)
 BASE_URL="https://trmnl.app"
-BATTERY_VOLTAGE="100.00"
 RSSI="0"
 USER_AGENT="trmnl-display/0.1.1"
 DEBUG_MODE=false  # Set to true to enable debug messages, false to disable
@@ -29,8 +30,9 @@ DISPLAY_X=75
 DISPLAY_Y=25
 
 # Size of the PNG in *pixels*
-PNG_WIDTH=1400
-PNG_HEIGHT=840
+PNG_WIDTH=$(get_kindle_height)
+PNG_HEIGHT=$(get_kindle_width)
+ROTATION=90
 
 # ---------------------------------------------------------------------------- #
 
@@ -51,6 +53,7 @@ DEBUG_Y=0
 eips_debug() {
   if [ "$DEBUG_MODE" = true ]; then
     eips "${DEBUG_X}" "${DEBUG_Y}" "$1"
+    echo "$1" #Also echo to terminal
     DEBUG_Y=$((DEBUG_Y+1))
   fi
 }
@@ -70,10 +73,13 @@ while true; do
   eips_debug "Fetching JSON..."
 
   # 2) Fetch JSON metadata
+  BATTERY_VOLTAGE=$(get_kindle_battery)
   RESPONSE="$(
     curl -s \
       -H "access-token: $API_KEY" \
       -H "battery-voltage: $BATTERY_VOLTAGE" \
+      -H "png-width: $PNG_WIDTH" \
+      -H "png-height: $PNG_HEIGHT" \
       -H "rssi: $RSSI" \
       -A "$USER_AGENT" \
       "${BASE_URL}/api/display"
@@ -92,7 +98,7 @@ while true; do
   eips_debug "JSON: ${SHORT_JSON}..."
 
   # 3) Parse JSON (naive sed approach)
-  IMAGE_URL=$(echo "$RESPONSE" | sed -n 's/.*"image_url":"\([^"]*\)".*/\1/p')
+  IMAGE_URL=$(echo "$RESPONSE" | sed -n 's/.*"image_url":"\([^"]*\)".*/\1/p' | sed 's/\\u0026/\&/g')
   eips_debug "ORIGINAL_URL: ${IMAGE_URL}"
 
   REFRESH_RATE=$(echo "$RESPONSE" | sed -n 's/.*"refresh_rate":\([^,}]*\).*/\1/p')
