@@ -70,6 +70,17 @@ while true; do
 
   # 1) Indicate the start of a new loop
   eips_debug "TRMNL Kindle Debug Script"
+
+  eips_debug "Wait for wifi..."
+  # enable wireless if it is currently off
+  if [ 0 -eq `lipc-get-prop com.lab126.cmd wirelessEnable` ]; then
+    eips_debug "WiFi is off, turning it on now"
+    lipc-set-prop com.lab126.cmd wirelessEnable 1
+    #lipc-set-prop com.lab126.wifid enable 1 
+    DISABLE_WIFI=1
+  fi
+  "$DIR/wait-for-wifi.sh" "$WIFI_TEST_IP"
+
   eips_debug "Fetching JSON..."
 
   # 2) Fetch JSON metadata
@@ -168,5 +179,18 @@ while true; do
 
   # Optional: show how long we will sleep (only in debug mode)
   eips_debug "Sleeping for $REFRESH_RATE seconds..."
-  sleep "$REFRESH_RATE"
+  
+  # disable wireless if necessary
+  if [ 1 -eq $DISABLE_WIFI ]; then
+    eips_debug "Disabling WiFi"
+    lipc-set-prop com.lab126.cmd wirelessEnable 0
+    #lipc-set-prop com.lab126.wifid enable 0
+  fi
+  
+  # take a bit of time before going to sleep, so this process can be aborted
+  sleep 10
+
+  echo 0 > /sys/class/rtc/rtc1/wakealarm
+  echo "+180" > /sys/class/rtc/rtc1/wakealarm
+  echo "mem" > /sys/power/state
 done
