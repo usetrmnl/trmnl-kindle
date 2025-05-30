@@ -58,6 +58,14 @@ eips_debug() {
   fi
 }
 
+init() {
+  /etc/init.d/framework stop
+  initctl stop webreader >/dev/null 2>&1
+  echo powersave >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+  lipc-set-prop com.lab126.powerd preventScreenSaver 1
+}
+
+init
 while true; do
   # Clear the screen only if in debug mode, otherwise clear right before displaying the image
   if [ "$DEBUG_MODE" = true ]; then
