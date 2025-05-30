@@ -8,6 +8,11 @@
           "name": "Start TRMNL",
           "priority": 100,
           "action": "./TRMNL.sh"
+        },
+        {
+          "name": "Stop TRMNL",
+          "priority": 100,
+          "action": "./stop.sh"
         }
       ]
     }
