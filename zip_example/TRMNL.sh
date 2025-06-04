@@ -20,6 +20,7 @@ BASE_URL="https://trmnl.app"
 RSSI="0"
 USER_AGENT="trmnl-display/0.1.1"
 DEBUG_MODE=false  # Set to true to enable debug messages, false to disable
+DIR="$(dirname "$0")"
 
 # Temporary folder to hold downloaded files
 TMP_DIR="/tmp/trmnl-kindle"
