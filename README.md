@@ -4,15 +4,15 @@ This guide explains how to jailbreak your Kindle using WinterBreak, then convert
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-alpha-release.jpeg" width="650px"></kdb>
 
-As of April 15, 2025 **this is an alpha release**. Issues and PRs are welcome. Tested on 10th gen, 12th gen Kindle e-ink displays.
+As of June 10, 2025 **this is a beta release**. Issues and PRs are welcome. Tested on 10th gen, 12th gen Kindle e-ink displays.
 
 ## Prerequisites
 - A PC/Mac
-- TRMNL API key (physical device **or** [BYOD license](https://shop.usetrmnl.com/products/byod) **or** [BYOD/S client](https://docs.usetrmnl.com/go/diy/byod-s). No* purchase necessary.
+- TRMNL [BYOD license](https://shop.usetrmnl.com/products/byod) **or** [BYOD/S client](https://docs.usetrmnl.com/go/diy/byod-s). No* purchase necessary.
 - Registered Kindle (5th gen or later)
 - Kindle connected to WiFi
 
-`*` - for a 100% free, DIY approach you need to modify our `TRMNL_KINDLE` Zip (Step 19 below) to point to your own server, which is currently beyond the scope of this guide. this code will also be made available.
+`*` - for a 100% free DIY approach, modify our `TRMNL_KINDLE` Zip (Step 19 below) to point to your own server.
 
 ## Introduction
 **[WinterBreak](https://kindlemodding.org/jailbreaking/WinterBreak/)** is a jailbreak released by **HackerDude** on **New Year’s Day 2025**. It's based on **Mesquito** and allows Kindle users to run custom applications like TRMNL. Special thanks to their many contributors and beta testers.
@@ -174,6 +174,8 @@ https://usetrmnl.com/devices/<device-id>/kindle/TRMNL_KINDLE.zip
 ```
 
 This will download a file, `TRMNL_KINDLE_<date>.zip`.
+
+If you do not have a TRMNL account with BYOD license, you can instead try the [zip_example](https://github.com/usetrmnl/trmnl-kindle/tree/main/zip_example) contents and point the URL to your BYOS setup.
 
 **Troubleshooting**
 
