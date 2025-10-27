@@ -198,7 +198,12 @@ Do this on your computer.
 Connect USB and enter drag/drop mode.
 
 ### 24. Copy TRMNL to Kindle
-Copy the `TRMNL_KINDLE` folder to Kindle’s `extensions` folder. It may be named TRMNL_KINDLE_20250415 with a datestamp at the end. 
+Copy the `TRMNL_KINDLE` folder to Kindle’s `extensions` folder. It may be named TRMNL_KINDLE_20250415 with a datestamp at the end.
+
+#### Note on the API KEY:
+- The API key is already included in the TRMNL_KINDLE folder, however if you are using the example from this repo, then you need to
+login to your TRMNL account and grab the API Key associted with your BYOD license.
+Create a new file called `apikey.txt` in the `TRMNL_KINDLE` directory that only has your API Key in it
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-extension.png" width="500px"></kdb>
 
