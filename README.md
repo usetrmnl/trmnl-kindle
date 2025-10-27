@@ -168,11 +168,18 @@ Wait until installation completes and **KUAL book** appears in your library.
 ### 19. Set your device model to Kindle
 (Skip this step if using a BYOS server and do not have a TRMNL account)
 
-Inside TRMNL visit your BYOD device settings via the top-right > gear cog icon. Select your Kindle edition in the Device Model dropdown.
+Inside TRMNL visit your BYOD device settings via the top-right > gear cog icon. Select your Kindle edition in the Device Model dropdown. Do not save the changes just yet.
 
-![image](https://github.com/user-attachments/assets/6ed0560b-c74b-4d05-ad82-06c07afd8cf3)
+![image](images/trmnl-byod-device.png)
 
-### 20. Download TRMNL KUAL Package
+### 20. Add your Kindle MAC address to your TRMNL account
+Still on the BYOD device setting page, scroll down to the Device Credentials section and enter your Kindle's MAC address. Save all changes on this screen.
+
+You can find the MAC address of your Kindle by navigating to _Settings_ → _Device Options_ → _Device Info_ on your device (this might differ slightly by kindle models and firmware versions).
+
+![image](images/trmnl-byod-mac.png)
+
+### 21. Download TRMNL KUAL Package
 Download your TRMNL KUAL package. Log into usetrmnl.com and find your Device ID by navigating to the top-right dropdown > clicking a device. Your Device ID will be in the URL, e.g. `1234`.
 
 Next, construct this URL and visit in a new tab:
@@ -184,12 +191,8 @@ This will download a file, `TRMNL_KINDLE_<date>.zip`.
 
 If you do not have a TRMNL account with BYOD license, you can instead try the [zip_example](https://github.com/usetrmnl/trmnl-kindle/tree/main/zip_example) contents and point the URL to your BYOS setup.
 
-### 21. Unzip TRMNL Package
+### 22. Unzip TRMNL Package
 Do this on your computer.
-
-### 22. Create a new file in the TRMNL_KINDLE folder apikey.txt
-Login to your TRMNL account and grab the API Key associted with your BYOD license
-Create a new file called `apikey.txt` in the `TRMNL_KINDLE` directory that only has your API Key in it
 
 ### 23. Connect Kindle to computer
 Connect USB and enter drag/drop mode.
