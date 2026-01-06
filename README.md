@@ -131,7 +131,7 @@ Run the Hotfix after every OTA update.
 - Download MRPI and KUAL: [KUAL-MRPI](https://fw.notmarek.com/khf/kual-mrinstaller-khf.tar.xz), provided by Marek: [More info](https://fw.notmarek.com/khf/)
 
 ### 14. Choose Correct KUAL Version
-- **Newer Kindles (6th gen +):** [KUAL Coplate](https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/Update_KUALBooklet_ALLDEVICES_KS2_install.bin)
+- **Newer Kindles (6th gen +):** [KUAL Coplate](https://kindlemodding.org/jailbreaking/post-jailbreak/installing-kual-mrpi/Update_KUALBooklet_HDRepack.bin)
 - **Legacy Kindles:** [KUAL Legacy](https://storage.gra.cloud.ovh.net/v1/AUTH_2ac4bfee353948ec8ea7fd1710574097/mr-public/KUAL/KUAL-v2.7.35-g2d06358-20250103.tar.xz)
 
 ### 15. Extract and Copy MRPI and KUAL
