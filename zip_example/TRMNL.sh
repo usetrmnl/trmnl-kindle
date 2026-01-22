@@ -34,6 +34,9 @@ PNG_WIDTH=$(get_kindle_height)
 PNG_HEIGHT=$(get_kindle_width)
 ROTATION=90
 
+# Get the MAC address for validation
+MAC_ADDRESS=$(get_mac_address)
+
 # ---------------------------------------------------------------------------- #
 
 # If eips is not found (i.e. running locally), define a no-op stub for testing
@@ -81,6 +84,7 @@ while true; do
       -H "png-width: $PNG_WIDTH" \
       -H "png-height: $PNG_HEIGHT" \
       -H "rssi: $RSSI" \
+      -H "ID: $MAC_ADDRESS" \
       -A "$USER_AGENT" \
       "${BASE_URL}/api/display"
   )"
