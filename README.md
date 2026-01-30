@@ -8,7 +8,7 @@ As of June 10, 2025 **this is a beta release**. Issues and PRs are welcome. Test
 
 ## Prerequisites
 - A PC/Mac
-- TRMNL [BYOD license](https://shop.usetrmnl.com/products/byod) **or** [BYOD/S client](https://docs.usetrmnl.com/go/diy/byod-s). No* purchase necessary.
+- TRMNL [BYOD license](https://shop.trmnl.com/products/byod) **or** [BYOD/S client](https://docs.trmnl.com/go/diy/byod-s). No* purchase necessary.
 - Registered Kindle (6th gen or later)
 - Kindle connected to WiFi
 
