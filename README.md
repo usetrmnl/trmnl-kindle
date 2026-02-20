@@ -17,7 +17,7 @@ As of June 10, 2025 **this is a beta release**. Issues and PRs are welcome. Test
 ## Introduction
 **[WinterBreak](https://kindlemodding.org/jailbreaking/WinterBreak/)** is a jailbreak released by **HackerDude** on **New Year’s Day 2025**. It's based on **Mesquito** and allows Kindle users to run custom applications like TRMNL. Special thanks to their many contributors and beta testers.
 
-**Note**: Mesquito does **NOT** work on Kindle firmware 5.18.1 and later. Open your Kindle's settings tray > All Settings > Device options > Device info to determine which version you're using. If you are on >=5.18.1 and <= 5.18.5.0.1, you can leverage [AdBreak](https://kindlemodding.org/jailbreaking/AdBreak/) to jailbreak your kindle.
+**Note**: Mesquito does **NOT** work on Kindle firmware 5.18.1 and later. Open your Kindle's settings tray > All Settings > Device options > Device info to determine which version you're using. If you are on >= 5.18.1 and <= 5.18.5.0.1, you can leverage [AdBreak](https://kindlemodding.org/jailbreaking/AdBreak/) to jailbreak your kindle.
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-firmware-check.jpeg" width="500px"/></kdb>
 
