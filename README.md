@@ -229,6 +229,9 @@ You may see an error, such as `Fetching JSON... error.. Retry in 60s.` This like
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-json-fetch-error.jpeg" width="650px"></kdb>
 
+**Preventing your Kindle from entering sleep mode**
+If your Kindle falls asleep after about 15–20 minutes, you can turn off this feature by opening the search bar, typing `~ds`, and pressing Enter. This tweak has been tested on the 7th-generation Kindle (standard model, not the Paperwhite).
+
 ## Next steps
 
 Our team is working to accommodate multiple Kindle device frame dimensions, open source more the TRMNL_KINDLE jailbreak logic for easy extension, and handle Kindle device "sleep" screens + redraws.
