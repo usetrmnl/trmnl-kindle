@@ -34,7 +34,7 @@ get_kindle_height() {
 }
 
 get_mac_address() {
-    local address=$(cat /sys/class/net/wlan0/address | tr '[:lower:]' '[:upper:]')
+  local address=$(cat /sys/class/net/wlan0/address | tr a-z A-Z)
 
-    echo "$address"
+  echo "$address"
 }
