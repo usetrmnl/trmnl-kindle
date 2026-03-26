@@ -26,8 +26,8 @@ TMP_DIR="/tmp/trmnl-kindle"
 mkdir -p "$TMP_DIR"
 
 # Coordinates for displaying the PNG in *pixels*
-DISPLAY_X=75
-DISPLAY_Y=25
+DISPLAY_X=0
+DISPLAY_Y=0
 
 # Size of the PNG in *pixels*
 PNG_WIDTH=$(get_kindle_height)
