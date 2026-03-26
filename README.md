@@ -2,6 +2,8 @@
 
 This guide explains how to jailbreak your Kindle using WinterBreak, then convert it into a personal dashboard with TRMNL.
 
+**As of 2026 we recommended using [our KOReader method](https://github.com/usetrmnl/trmnl-koreader) instead**. It is faster, easier, and has a higher success rate.
+
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-alpha-release.jpeg" width="650px"></kdb>
 
 As of June 10, 2025 **this is a beta release**. Issues and PRs are welcome. Tested on 10th gen, 12th gen Kindle e-ink displays.
