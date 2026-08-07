@@ -98,7 +98,7 @@ while true; do
   # 2) Fetch JSON metadata
   BATTERY_VOLTAGE=$(get_kindle_battery)
   RESPONSE="$(
-    curl -s \
+    curl -sL \
       -H "access-token: $API_KEY" \
       -H "battery-voltage: $BATTERY_VOLTAGE" \
       -H "png-width: $PNG_WIDTH" \
@@ -122,7 +122,7 @@ while true; do
   eips_debug "JSON: ${SHORT_JSON}..."
 
   # 3) Parse JSON (naive sed approach)
-  IMAGE_URL=$(echo "$RESPONSE" | sed -n 's/.*"image_url":"\([^"]*\)".*/\1/p' | sed 's/\\u0026/\&/g')
+  IMAGE_URL=$(echo "$RESPONSE" | sed -n 's/.*"image_url":"\([^"]*\)".*/\1/p' | sed 's/\\u0026/\&/g' | tr -d '\\')
   eips_debug "ORIGINAL_URL: ${IMAGE_URL}"
 
   REFRESH_RATE=$(echo "$RESPONSE" | sed -n 's/.*"refresh_rate":\([^,}]*\).*/\1/p' | tr -d ' "')
@@ -166,7 +166,7 @@ while true; do
   eips_debug "Downloading image..."
 
   # Download the image directly from IMAGE_URL
-  curl -s -o "$IMAGE_PATH" \
+  curl -sL -o "$IMAGE_PATH" \
     -A "$USER_AGENT" \
     "$IMAGE_URL"
 
