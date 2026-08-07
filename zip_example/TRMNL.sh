@@ -33,7 +33,7 @@ DISPLAY_Y=0
 # Size of the PNG in *pixels*
 PNG_WIDTH=$(get_kindle_height)
 PNG_HEIGHT=$(get_kindle_width)
-ROTATION=90
+MIN_REFRESH_RATE=300
 
 # Get the MAC address for validation
 MAC_ADDRESS=$(get_mac_address)
@@ -125,8 +125,11 @@ while true; do
   IMAGE_URL=$(echo "$RESPONSE" | sed -n 's/.*"image_url":"\([^"]*\)".*/\1/p' | sed 's/\\u0026/\&/g')
   eips_debug "ORIGINAL_URL: ${IMAGE_URL}"
 
-  REFRESH_RATE=$(echo "$RESPONSE" | sed -n 's/.*"refresh_rate":\([^,}]*\).*/\1/p')
-  [ -z "$REFRESH_RATE" ] && REFRESH_RATE="60"
+  REFRESH_RATE=$(echo "$RESPONSE" | sed -n 's/.*"refresh_rate":\([^,}]*\).*/\1/p' | tr -d ' "')
+  # API range is 60..86400, so 6+ digits is out of range; rejecting it also stops a bogus
+  # value from overflowing the comparison below and parking the wake alarm decades away
+  case "$REFRESH_RATE" in ''|*[!0-9]*|??????*) REFRESH_RATE=0 ;; esac
+  [ "$REFRESH_RATE" -lt "$MIN_REFRESH_RATE" ] && REFRESH_RATE="$MIN_REFRESH_RATE"
 
   # Quick check for missing URL
   if [ -z "$IMAGE_URL" ]; then
@@ -204,6 +207,6 @@ while true; do
   sleep 10
 
   echo 0 > /sys/class/rtc/rtc1/wakealarm
-  echo "+180" > /sys/class/rtc/rtc1/wakealarm
+  echo "+${REFRESH_RATE}" > /sys/class/rtc/rtc1/wakealarm
   echo "mem" > /sys/power/state
 done
