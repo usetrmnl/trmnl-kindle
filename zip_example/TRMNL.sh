@@ -40,7 +40,9 @@ MAC_ADDRESS=$(get_mac_address)
 # ---------------------------------------------------------------------------- #
 
 # If eips is not found (i.e. running locally), define a no-op stub for testing
-if ! which eips >/dev/null 2>&1; then
+if ! command -v eips >/dev/null 2>&1 \
+   && ! type eips >/dev/null 2>&1 \
+   && ! [ -x /usr/sbin/eips ]; then
   eips() {
     # Simply echo to console so you can see what *would* happen on Kindle
     echo "[eips STUB] $*"
