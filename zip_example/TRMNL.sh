@@ -42,9 +42,20 @@ MIN_REFRESH_RATE=300
 # Get the MAC address for validation
 MAC_ADDRESS=$(get_mac_address)
 
+# How wifi power state should be managed:
+# * ${WIFI_ALWAYS_ON} - keep wifi on
+# * ${WIFI_DISABLED_DURING_SLEEP} - disable wifi before going to sleep
+# * ${WIFI_AUTO} - keep wifi state during sleep as it was before script
+#   execution
+WIFI_MANAGEMENT=${WIFI_DISABLED_DURING_SLEEP}
+
 if [ -e ./TRMNL_config.sh ]; then
   source ./TRMNL_config.sh
 fi
+
+# IP or domain used to test if network is up (without the protocol, port or
+# path)
+WIFI_TEST_ADDRESS=${WIFI_TEST_ADDRESS:-$(echo "$BASE_URL" | cut -d/ -f3 | cut -d: -f1)}
 
 # ---------------------------------------------------------------------------- #
 
@@ -56,6 +67,7 @@ if ! command -v eips >/dev/null 2>&1 \
     # Simply echo to console so you can see what *would* happen on Kindle
     echo "[eips STUB] $*"
   }
+  echo "eips binary not found! Screen changes won't be applied." >&2
 fi
 
 # Helper to track a text-based "cursor" for debug lines
@@ -77,9 +89,27 @@ init() {
   initctl stop webreader >/dev/null 2>&1
   echo powersave >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
   lipc-set-prop com.lab126.powerd preventScreenSaver 1
+  
+  # Note: The main body tries to keep the intial WiFi state during the sleep
+  # period, so we set it to the intent. Alternatively, we could drive this via
+  # the initial value of `DISABLE_WIFI`, but this feels too implicit and error
+  # prone.
+  if [ ${WIFI_MANAGEMENT} -eq ${WIFI_ALWAYS_ON} ]; then
+    eips_debug "WiFi set to always ON"
+    INITIAL_WIFI_STATE=1
+  elif [ ${WIFI_MANAGEMENT} -eq ${WIFI_DISABLED_DURING_SLEEP} ]; then
+    eips_debug "WiFi set to be disabled during sleep"
+    INITIAL_WIFI_STATE=0
+  else
+    eips_debug "WiFi will keep initial state during sleep"
+    INITIAL_WIFI_STATE=$(lipc-get-prop com.lab126.cmd wirelessEnable)
+  fi
+  eips_debug "Setting intitial WiFi state to: ${INITIAL_WIFI_STATE}"
+  lipc-set-prop com.lab126.cmd wirelessEnable ${INITIAL_WIFI_STATE}
 }
 
 init
+DISABLE_WIFI=0
 while true; do
   # Clear the screen only if in debug mode, otherwise clear right before displaying the image
   if [ "$DEBUG_MODE" = true ]; then
@@ -101,16 +131,16 @@ while true; do
     #lipc-set-prop com.lab126.wifid enable 1 
     DISABLE_WIFI=1
   fi
-  "$DIR/wait-for-wifi.sh" "$WIFI_TEST_IP"
+  "$DIR/wait-for-wifi.sh" "$WIFI_TEST_ADDRESS"
 
   eips_debug "Fetching JSON..."
 
   # 2) Fetch JSON metadata
-  BATTERY_VOLTAGE=$(get_kindle_battery)
+  BATTERY_PERCENT=$(get_kindle_battery)
   RESPONSE="$(
     curl -sL \
       -H "access-token: $API_KEY" \
-      -H "battery-voltage: $BATTERY_VOLTAGE" \
+      -H "percent-charged: ${BATTERY_PERCENT}" \
       -H "png-width: $PNG_WIDTH" \
       -H "png-height: $PNG_HEIGHT" \
       -H "rssi: $RSSI" \
@@ -195,7 +225,15 @@ while true; do
   # Always clear screen before showing the image
   eips -c
   sleep 1
-  eips -g "$IMAGE_PATH" -x "$DISPLAY_X" -y "$DISPLAY_Y"
+  # eips on particular old Kindles (e.g. Kindle 4) does not support -x -y for
+  # image display (-g). Try to naively detect this by checking for -y existence
+  # in the usage strings
+  if eips | grep -q -v "\-y" ; then
+    eips_debug "Using compatiblity mode for image plotting"
+    eips -g "$IMAGE_PATH"
+  else
+    eips -g "$IMAGE_PATH" -x "$DISPLAY_X" -y "$DISPLAY_Y"
+  fi
 
   # 6) Print full URL & filename below the displayed image only if debug mode is on
   if [ "$DEBUG_MODE" = true ]; then
@@ -205,17 +243,18 @@ while true; do
 
   # Optional: show how long we will sleep (only in debug mode)
   eips_debug "Sleeping for $REFRESH_RATE seconds..."
-  
   # disable wireless if necessary
   if [ 1 -eq $DISABLE_WIFI ]; then
     eips_debug "Disabling WiFi"
     lipc-set-prop com.lab126.cmd wirelessEnable 0
     #lipc-set-prop com.lab126.wifid enable 0
   fi
-  
-  # take a bit of time before going to sleep, so this process can be aborted
-  sleep 10
 
+  # Take a bit of time before going to sleep, so this process can be aborted.
+  # This also prevents the hardware sleep mode from interrupting the screen
+  # refresh when plotting the image.
+  sleep 10
+  
   echo 0 > /sys/class/rtc/rtc1/wakealarm
   echo "+${REFRESH_RATE}" > /sys/class/rtc/rtc1/wakealarm
   echo "mem" > /sys/power/state

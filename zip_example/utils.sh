@@ -1,3 +1,10 @@
+# ----------------------------- CONSTANTS ---------------------------------------- #
+
+# Constants for configuring the wifi management
+readonly WIFI_AUTO=0
+readonly WIFI_ALWAYS_ON=1
+readonly WIFI_DISABLED_DURING_SLEEP=2
+
 # ----------------------------- UTILITY FUNCTIONS -------------------------------- #
 get_kindle_battery() {
   # Run the command and capture its output

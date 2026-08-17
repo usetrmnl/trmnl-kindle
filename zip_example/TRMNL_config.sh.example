@@ -20,5 +20,15 @@
 # Get the MAC address for validation
 # MAC_ADDRESS=$(get_mac_address)
 
+# IP or domain used to test if network is up (without the protocol, port or path)
+# WIFI_TEST_ADDRESS="8.8.8.8"
+
+# How wifi power state should be managed:
+# * ${WIFI_ALWAYS_ON} - keep wifi on
+# * ${WIFI_DISABLED_DURING_SLEEP} - disable wifi before going to sleep
+# * ${WIFI_AUTO} - keep wifi state during sleep as it was before script 
+#   execution
+# WIFI_MANAGEMENT=${WIFI_DISABLED_DURING_SLEEP}
+
 # Set to true to enable debug messages, false to disable
 # DEBUG_MODE=true
