@@ -78,7 +78,10 @@ DEBUG_Y=0
 # and increments DEBUG_Y for each new line.
 eips_debug() {
   if [ "$DEBUG_MODE" = true ]; then
-    eips "${DEBUG_X}" "${DEBUG_Y}" "$1"
+    # Preserve the last frame while activation is failing, even in debug mode.
+    if [ "${DEBUG_SCREEN:-false}" = true ]; then
+      eips "${DEBUG_X}" "${DEBUG_Y}" "$1"
+    fi
     echo "$1" #Also echo to terminal
     DEBUG_Y=$((DEBUG_Y+1))
   fi
@@ -90,10 +93,7 @@ init() {
   echo powersave >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
   lipc-set-prop com.lab126.powerd preventScreenSaver 1
   
-  # Note: The main body tries to keep the intial WiFi state during the sleep
-  # period, so we set it to the intent. Alternatively, we could drive this via
-  # the initial value of `DISABLE_WIFI`, but this feels too implicit and error
-  # prone.
+  # Preserve the configured WiFi state during successful sleep periods.
   if [ ${WIFI_MANAGEMENT} -eq ${WIFI_ALWAYS_ON} ]; then
     eips_debug "WiFi set to always ON"
     INITIAL_WIFI_STATE=1
@@ -108,31 +108,55 @@ init() {
   lipc-set-prop com.lab126.cmd wirelessEnable ${INITIAL_WIFI_STATE}
 }
 
-init
-DISABLE_WIFI=0
-while true; do
-  # Clear the screen only if in debug mode, otherwise clear right before displaying the image
-  if [ "$DEBUG_MODE" = true ]; then
-    eips -c
-    sleep 1
+wifi_up() {
+  # A loaded interface allows the existing fetch path even when ICMP is blocked.
+  "$DIR/wait-for-wifi.sh" "$WIFI_TEST_ADDRESS" || [ -e /sys/class/net/wlan0 ]
+}
+
+go_to_sleep() {
+  eips_debug "Sleeping for $REFRESH_RATE seconds..."
+  if [ "$INITIAL_WIFI_STATE" != 1 ]; then
+    eips_debug "Disabling WiFi"
+    lipc-set-prop com.lab126.cmd wirelessEnable 0
   fi
 
-  # Reset debug text row
-  DEBUG_Y=0
+  # Allow time to abort the script and finish refreshing the screen.
+  sleep 10
+  echo 0 > /sys/class/rtc/rtc1/wakealarm
+  echo "+${REFRESH_RATE}" > /sys/class/rtc/rtc1/wakealarm
+  echo "mem" > /sys/power/state
+}
 
-  # 1) Indicate the start of a new loop
-  eips_debug "TRMNL Kindle Debug Script"
-
+init
+REFRESH_RATE=$MIN_REFRESH_RATE
+while true; do
+  DEBUG_SCREEN=false
   eips_debug "Wait for wifi..."
   # enable wireless if it is currently off
   if [ 0 -eq `lipc-get-prop com.lab126.cmd wirelessEnable` ]; then
     eips_debug "WiFi is off, turning it on now"
     lipc-set-prop com.lab126.cmd wirelessEnable 1
     #lipc-set-prop com.lab126.wifid enable 1 
-    DISABLE_WIFI=1
   fi
-  "$DIR/wait-for-wifi.sh" "$WIFI_TEST_ADDRESS"
+  if ! wifi_up; then
+    lipc-set-prop com.lab126.cmd wirelessEnable 0
+    sleep 20
+    lipc-set-prop com.lab126.cmd wirelessEnable 1
+    if ! wifi_up; then
+      eips -g "$DIR/wifi-error.png"
+      lipc-set-prop com.lab126.cmd wirelessEnable 0
+      go_to_sleep
+      continue
+    fi
+  fi
 
+  DEBUG_SCREEN=true
+  if [ "$DEBUG_MODE" = true ]; then
+    eips -c
+    sleep 1
+  fi
+  DEBUG_Y=0
+  eips_debug "TRMNL Kindle Debug Script"
   eips_debug "Fetching JSON..."
 
   # 2) Fetch JSON metadata
@@ -241,21 +265,5 @@ while true; do
     eips 0 19 "File: $IMAGE_PATH"
   fi
 
-  # Optional: show how long we will sleep (only in debug mode)
-  eips_debug "Sleeping for $REFRESH_RATE seconds..."
-  # disable wireless if necessary
-  if [ 1 -eq $DISABLE_WIFI ]; then
-    eips_debug "Disabling WiFi"
-    lipc-set-prop com.lab126.cmd wirelessEnable 0
-    #lipc-set-prop com.lab126.wifid enable 0
-  fi
-
-  # Take a bit of time before going to sleep, so this process can be aborted.
-  # This also prevents the hardware sleep mode from interrupting the screen
-  # refresh when plotting the image.
-  sleep 10
-  
-  echo 0 > /sys/class/rtc/rtc1/wakealarm
-  echo "+${REFRESH_RATE}" > /sys/class/rtc/rtc1/wakealarm
-  echo "mem" > /sys/power/state
+  go_to_sleep
 done

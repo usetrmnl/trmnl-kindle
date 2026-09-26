@@ -193,6 +193,8 @@ This will download a file, `TRMNL_KINDLE_<date>.zip`.
 
 If you do not have a TRMNL account with BYOD license, you can instead try the [zip_example](https://github.com/usetrmnl/trmnl-kindle/tree/main/zip_example) contents and point the URL to your BYOS setup.
 
+When installing or updating from `zip_example`, copy all its files, including `wifi-error.png` alongside `TRMNL.sh` for the Wi-Fi failure indicator.
+
 ### 22. Unzip TRMNL Package
 Do this on your computer.
 
