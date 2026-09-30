@@ -78,10 +78,7 @@ DEBUG_Y=0
 # and increments DEBUG_Y for each new line.
 eips_debug() {
   if [ "$DEBUG_MODE" = true ]; then
-    # Preserve the last frame while activation is failing, even in debug mode.
-    if [ "${DEBUG_SCREEN:-false}" = true ]; then
-      eips "${DEBUG_X}" "${DEBUG_Y}" "$1"
-    fi
+    eips "${DEBUG_X}" "${DEBUG_Y}" "$1"
     echo "$1" #Also echo to terminal
     DEBUG_Y=$((DEBUG_Y+1))
   fi
@@ -130,7 +127,18 @@ go_to_sleep() {
 init
 REFRESH_RATE=$MIN_REFRESH_RATE
 while true; do
-  DEBUG_SCREEN=false
+  # Clear the screen only if in debug mode, otherwise clear right before displaying the image
+  if [ "$DEBUG_MODE" = true ]; then
+    eips -c
+    sleep 1
+  fi
+
+  # Reset debug text row
+  DEBUG_Y=0
+
+  # 1) Indicate the start of a new loop
+  eips_debug "TRMNL Kindle Debug Script"
+
   eips_debug "Wait for wifi..."
   # enable wireless if it is currently off
   if [ 0 -eq `lipc-get-prop com.lab126.cmd wirelessEnable` ]; then
@@ -150,13 +158,6 @@ while true; do
     fi
   fi
 
-  DEBUG_SCREEN=true
-  if [ "$DEBUG_MODE" = true ]; then
-    eips -c
-    sleep 1
-  fi
-  DEBUG_Y=0
-  eips_debug "TRMNL Kindle Debug Script"
   eips_debug "Fetching JSON..."
 
   # 2) Fetch JSON metadata
