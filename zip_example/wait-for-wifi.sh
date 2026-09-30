@@ -7,7 +7,7 @@ if [ -z "$test_ip" ]; then
 fi
 
 wait_for_wifi() {
-  max_retry=12
+  max_retry=30
   counter=0
 
   ping -c 1 "$test_ip" >/dev/null 2>&1
