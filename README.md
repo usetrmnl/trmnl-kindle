@@ -193,7 +193,7 @@ This will download a file, `TRMNL_KINDLE_<date>.zip`.
 
 If you do not have a TRMNL account with BYOD license, you can instead try the [zip_example](https://github.com/usetrmnl/trmnl-kindle/tree/main/zip_example) contents and point the URL to your BYOS setup.
 
-When installing or updating from `zip_example`, copy all its files, including `wifi-error.png` alongside `TRMNL.sh` for the Wi-Fi failure indicator.
+When installing or updating from `zip_example`, copy its files to the Kindle. Keep `exit-input` executable and preserve your existing credentials and settings. `wifi-error.png` must sit beside `TRMNL.sh` to show Wi-Fi failures. If you share these files with others, include the [licence notices](native/README.md#package).
 
 ### 22. Unzip TRMNL Package
 Do this on your computer.
@@ -231,6 +231,12 @@ Launch KUAL from your Kindle library.
 Your Kindle is now successfully running TRMNL!
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-alpha-release.jpeg" width="650px"></kdb>
+
+### Exit after an early wake
+
+Between refreshes, press the power button to wake the Kindle. When the exit prompt appears, tap and lift on a touchscreen, or press and release another button on a non-touch Kindle, to confirm. If you do nothing for ten seconds, TRMNL resumes its normal refresh cycle and goes back to sleep.
+
+On exit, TRMNL restores the settings and services it changed at startup, including Wi-Fi, and returns to the Kindle UI. If the prompt does not appear, see [troubleshooting](native/README.md#troubleshoot).
 
 **Troubleshooting JSON error**
 You may see an error, such as `Fetching JSON... error.. Retry in 60s.` This likely means you are still in Airplane Mode. Disble Airplane Mode, then re-open KUAL > TRMNL > Start TRMNL.

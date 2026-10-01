@@ -29,6 +29,8 @@ DIR="$(dirname "$0")"
 # Temporary folder to hold downloaded files
 TMP_DIR="/tmp/trmnl-kindle"
 mkdir -p "$TMP_DIR"
+DASHBOARD_CACHE="$TMP_DIR/.dashboard-$$.png"
+LAST_IMAGE_VALID=0
 
 # Coordinates for displaying the PNG in *pixels*
 DISPLAY_X=0
@@ -85,8 +87,25 @@ eips_debug() {
 }
 
 init() {
-  /etc/init.d/framework stop
-  initctl stop webreader >/dev/null 2>&1
+  # Save the Kindle screen before drawing anything.
+  local DEBUG_MODE=false
+  exit_status startup
+  capture_trmnl_state
+  # Devices using Upstart keep the Kindle UI running.
+  if [ -x /etc/init.d/framework ]; then
+    if /etc/init.d/framework stop; then
+      [ "$FRAMEWORK_STATE" != running ] || FRAMEWORK_STOPPED=1
+    else
+      CAN_EXIT=0 RESTORE_INCOMPLETE=1
+      exit_status 'ineligible init-failed framework'
+    fi
+  fi
+  if initctl stop webreader >/dev/null 2>&1; then
+    [ "$WEBREADER_STATE" != running ] || WEBREADER_STOPPED=1
+  elif [ "$WEBREADER_STATE" = running ]; then
+    CAN_EXIT=0 RESTORE_INCOMPLETE=1
+    exit_status 'ineligible init-failed webreader'
+  fi
   echo powersave >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
   lipc-set-prop com.lab126.powerd preventScreenSaver 1
   
@@ -99,7 +118,7 @@ init() {
     INITIAL_WIFI_STATE=0
   else
     eips_debug "WiFi will keep initial state during sleep"
-    INITIAL_WIFI_STATE=$(lipc-get-prop com.lab126.cmd wirelessEnable)
+    INITIAL_WIFI_STATE=$ORIGINAL_WIFI
   fi
   eips_debug "Setting intitial WiFi state to: ${INITIAL_WIFI_STATE}"
   lipc-set-prop com.lab126.cmd wirelessEnable ${INITIAL_WIFI_STATE}
@@ -119,12 +138,30 @@ go_to_sleep() {
 
   # Allow time to abort the script and finish refreshing the screen.
   sleep 10
-  echo 0 > /sys/class/rtc/rtc1/wakealarm
-  echo "+${REFRESH_RATE}" > /sys/class/rtc/rtc1/wakealarm
-  echo "mem" > /sys/power/state
+  OWNED_ALARM=
+  if echo 0 > /sys/class/rtc/rtc1/wakealarm &&
+      echo "+${REFRESH_RATE}" > /sys/class/rtc/rtc1/wakealarm; then
+    OWNED_ALARM=$(cat /sys/class/rtc/rtc1/wakealarm)
+    case "$OWNED_ALARM" in ''|*[!0-9]*|0*|???????????*) OWNED_ALARM= ;; esac
+  fi
+  sync || echo 'TRMNL: sync failed' >&2
+  if echo "mem" > /sys/power/state; then
+    offer_early_exit "$OWNED_ALARM" "$(cat /sys/class/rtc/rtc1/since_epoch 2>/dev/null)"
+  fi
 }
 
 init
+trap restore_trmnl EXIT
+trap 'exit 0' TERM INT HUP
+capture_stock_screen
+if [ "$CAN_EXIT" = 1 ]; then
+  if select_exit_input; then
+    exit_status "eligible $EXIT_LABEL"
+  else
+    CAN_EXIT=0
+    exit_status "ineligible $EXIT_UNAVAILABLE_REASON"
+  fi
+fi
 REFRESH_RATE=$MIN_REFRESH_RATE
 while true; do
   # Clear the screen only if in debug mode, otherwise clear right before displaying the image
@@ -231,12 +268,9 @@ while true; do
   eips_debug "Downloading image..."
 
   # Download the image directly from IMAGE_URL
-  curl -sL -o "$IMAGE_PATH" \
+  if ! curl -sL -o "$IMAGE_PATH" \
     -A "$USER_AGENT" \
-    "$IMAGE_URL"
-
-  # Check download success
-  if [ ! -s "$IMAGE_PATH" ]; then
+    "$IMAGE_URL" || [ ! -s "$IMAGE_PATH" ]; then
     eips_debug "Error: Download failed!"
     eips_debug "Retry in 60s..."
     sleep 60
@@ -253,11 +287,8 @@ while true; do
   # eips on particular old Kindles (e.g. Kindle 4) does not support -x -y for
   # image display (-g). Try to naively detect this by checking for -y existence
   # in the usage strings
-  if eips | grep -q -v "\-y" ; then
-    eips_debug "Using compatiblity mode for image plotting"
-    eips -g "$IMAGE_PATH"
-  else
-    eips -g "$IMAGE_PATH" -x "$DISPLAY_X" -y "$DISPLAY_Y"
+  if display_image "$IMAGE_PATH"; then
+    cache_displayed_image "$IMAGE_PATH"
   fi
 
   # 6) Print full URL & filename below the displayed image only if debug mode is on
