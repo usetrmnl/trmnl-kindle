@@ -60,14 +60,15 @@ elif name == 'sleep':
         state['retry'] += 1; save()
         assert state['retry'] == 1, 'more than one activation retry'
 elif name == 'test-suspend':
-    event('suspend', (p/'sys/class/rtc/rtc1/wakealarm').read_text().strip(), state['wifi'])
+    alarm = next(p.glob('sys/class/rtc/rtc*/wakealarm'))
+    event('suspend', alarm.read_text().strip(), state['wifi'])
     state['cycle'] += 1; state['retry'] = 0; save()
     if state['cycle'] == len(plans): sys.exit(99)
     update_interface()
 '''
 
 
-def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=False):
+def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=False, rtc='rtc1'):
     with tempfile.TemporaryDirectory() as directory:
         p = Path(directory)
         (p/'bin').mkdir()
@@ -80,7 +81,7 @@ def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=F
             (p/'sys/class/net/wlan0').mkdir(parents=True)
         (p/'events').touch()
         (p/'wifi-error.png').write_bytes((ROOT/'zip_example/wifi-error.png').read_bytes())
-        for filename in ['sys/class/rtc/rtc1/wakealarm', 'sys/devices/system/cpu/cpu0/cpufreq/scaling_governor']:
+        for filename in [f'sys/class/rtc/{rtc}/wakealarm', 'sys/devices/system/cpu/cpu0/cpufreq/scaling_governor']:
             (p/filename).parent.mkdir(parents=True, exist_ok=True)
         # Copy only known source files, never credentials or a user's config.
         for filename in ['TRMNL.sh', 'utils.sh', 'wait-for-wifi.sh']:
@@ -145,3 +146,4 @@ if __name__ == '__main__':
         run_case(f'policy {policy}, initial {initial}', [['bad', 'bad'], ['up']], [420, 900], policy, initial)
     run_case('debug failure retains upstream diagnostics', [['up'], ['bad', 'bad']], [900, 900], debug=True)
     run_case('unknown initial auto state sleeps with Wi-Fi off', [['up']], [900], policy=0, empty_read=True)
+    run_case('wake alarm on rtc0 (11th gen Kindle)', [['up'], ['up']], [900, 900], rtc='rtc0')

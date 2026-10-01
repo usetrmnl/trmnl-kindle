@@ -85,7 +85,13 @@ eips_debug() {
 }
 
 init() {
-  /etc/init.d/framework stop
+  # Newer firmware (seen on 5.19.2 on the 11th gen Kindle) runs the UI as upstart jobs
+  # and has no init.d framework script. Without this the UI keeps running, its status
+  # icons are drawn over the dashboard, and the suspend below is refused.
+  /etc/init.d/framework stop 2>/dev/null || {
+    stop framework >/dev/null 2>&1 || initctl stop framework >/dev/null 2>&1
+    stop lab126_gui >/dev/null 2>&1
+  }
   initctl stop webreader >/dev/null 2>&1
   echo powersave >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
   lipc-set-prop com.lab126.powerd preventScreenSaver 1
@@ -119,9 +125,22 @@ go_to_sleep() {
 
   # Allow time to abort the script and finish refreshing the screen.
   sleep 10
-  echo 0 > /sys/class/rtc/rtc1/wakealarm
-  echo "+${REFRESH_RATE}" > /sys/class/rtc/rtc1/wakealarm
-  echo "mem" > /sys/power/state
+  # The wake alarm is rtc1 on most models but rtc0 on others (e.g. the 11th gen
+  # Kindle). Suspending without an alarm set would sleep until the power button.
+  RTC=""
+  for r in /sys/class/rtc/rtc1 /sys/class/rtc/rtc0; do
+    [ -d "$r" ] && { RTC="$r"; break; }
+  done
+  if [ -n "$RTC" ]; then
+    echo 0 > "$RTC/wakealarm"
+    echo "+${REFRESH_RATE}" > "$RTC/wakealarm"
+    # A refused suspend ("Device or resource busy") returns at once; wait out the
+    # interval instead of looping straight into the next refresh.
+    echo "mem" > /sys/power/state || sleep "$REFRESH_RATE"
+  else
+    eips_debug "No RTC found; waiting instead of suspending"
+    sleep "$REFRESH_RATE"
+  fi
 }
 
 init
