@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="320" viewBox="0 0 960 320" stroke-opacity="1" role="img" aria-labelledby="title desc">
+  <title id="title">Touch the screen to exit</title>
+  <desc id="desc">A finger touches a screen, then an arrow points to an open exit door.</desc>
+  <rect x="8" y="8" width="944" height="304" rx="16" fill="white" stroke="black" stroke-opacity="1" stroke-width="16"/>
+  <g id="touch-screen" fill="white" stroke="black" stroke-opacity="1" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="82" y="42" width="204" height="238" rx="12"/>
+    <path d="M177 68V56 M137 80L127 70 M122 118H108 M219 80L229 70"/>
+    <circle cx="177" cy="118" r="29" fill="none" stroke-width="16"/>
+    <path d="M172 275L133 221Q122 205 132 196Q141 188 151 200L165 215V124Q165 108 177 108Q190 108 190 124V176Q198 165 209 174Q219 169 227 185Q238 180 244 196L252 219Q257 238 245 257L235 275Z"/>
+  </g>
+  <g id="then" fill="none" stroke="black" stroke-opacity="1" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M361 160H523M486 122L525 160L486 198"/>
+  </g>
+  <g id="exit-door" stroke="black" stroke-opacity="1" stroke-width="16" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M668 269V54H805V269" fill="none"/>
+    <path d="M668 54L609 90V278L668 246Z" fill="white"/>
+    <path d="M652 160V177" fill="none" stroke-width="16"/>
+    <path d="M738 162H876M839 125L878 162L839 199" fill="none" stroke="white" stroke-opacity="1" stroke-width="28"/>
+    <path d="M738 162H876M839 125L878 162L839 199" fill="none" stroke-width="16"/>
+  </g>
+</svg>
