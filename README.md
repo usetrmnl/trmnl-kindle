@@ -6,7 +6,7 @@ This guide explains how to jailbreak your Kindle using WinterBreak, then convert
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/trmnl-kindle-alpha-release.jpeg" width="650px"></kdb>
 
-As of June 10, 2025 **this is a beta release**. Issues and PRs are welcome. Tested on 10th gen, 12th gen Kindle e-ink displays.
+As of June 10, 2025 **this is a beta release**. Issues and PRs are welcome. Tested on 10th gen, 11th gen (Kindle 2022, firmware 5.19.2.0.1) and 12th gen Kindle e-ink displays.
 
 ## Prerequisites
 - A PC/Mac
