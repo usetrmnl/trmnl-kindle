@@ -126,21 +126,13 @@ go_to_sleep() {
   # Allow time to abort the script and finish refreshing the screen.
   sleep 10
   # The wake alarm is rtc1 on most models but rtc0 on others (e.g. the 11th gen
-  # Kindle). Suspending without an alarm set would sleep until the power button.
-  RTC=""
-  for r in /sys/class/rtc/rtc1 /sys/class/rtc/rtc0; do
-    [ -d "$r" ] && { RTC="$r"; break; }
-  done
-  if [ -n "$RTC" ]; then
-    echo 0 > "$RTC/wakealarm"
-    echo "+${REFRESH_RATE}" > "$RTC/wakealarm"
-    # A refused suspend ("Device or resource busy") returns at once; wait out the
-    # interval instead of looping straight into the next refresh.
+  # Kindle). Suspend only if the alarm write succeeds. Without an alarm, the Kindle
+  # sleeps until the power button. If any step fails, sleep for the interval instead.
+  RTC=/sys/class/rtc/rtc1
+  [ -d "$RTC" ] || RTC=/sys/class/rtc/rtc0
+  echo 0 > "$RTC/wakealarm" &&
+    echo "+${REFRESH_RATE}" > "$RTC/wakealarm" &&
     echo "mem" > /sys/power/state || sleep "$REFRESH_RATE"
-  else
-    eips_debug "No RTC found; waiting instead of suspending"
-    sleep "$REFRESH_RATE"
-  fi
 }
 
 init
