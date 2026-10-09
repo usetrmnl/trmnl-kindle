@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="320" viewBox="0 0 960 320" stroke-opacity="1" role="img" aria-labelledby="title desc">
+  <title id="title">Press a button to exit</title>
+  <desc id="desc">A finger presses a button on the side of a device, then an arrow points to an open exit door.</desc>
+  <rect x="8" y="8" width="944" height="304" rx="16" fill="white" stroke="black" stroke-opacity="1" stroke-width="16"/>
+  <g id="side-button" fill="white" stroke="black" stroke-opacity="1" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="52" y="42" width="154" height="238" rx="12"/>
+    <rect x="78" y="68" width="102" height="186" rx="4" stroke-width="8"/>
+    <rect x="200" y="132" width="22" height="56" rx="6" fill="black" stroke-width="8"/>
+    <path d="M329.9 163.5L292.1 190.8Q280.9 198.5 274.6 191.5Q269 185.2 277.4 178.2L287.9 168.4L224.2 168.4Q213 168.4 213 160Q213 150.9 224.2 150.9L260.6 150.9Q252.9 145.3 259.2 137.6Q255.7 130.6 266.9 125Q263.4 117.3 274.6 113.1L290.7 107.5Q304 104 317.3 112.4L329.9 119.4Z" stroke-width="14"/>
+  </g>
+  <g id="then" fill="none" stroke="black" stroke-opacity="1" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M361 160H523M486 122L525 160L486 198"/>
+  </g>
+  <g id="exit-door" stroke="black" stroke-opacity="1" stroke-width="16" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M668 269V54H805V269" fill="none"/>
+    <path d="M668 54L609 90V278L668 246Z" fill="white"/>
+    <path d="M652 160V177" fill="none" stroke-width="16"/>
+    <path d="M738 162H876M839 125L878 162L839 199" fill="none" stroke="white" stroke-opacity="1" stroke-width="28"/>
+    <path d="M738 162H876M839 125L878 162L839 199" fill="none" stroke-width="16"/>
+  </g>
+</svg>
