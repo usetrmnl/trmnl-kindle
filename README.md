@@ -182,11 +182,11 @@ You can find the MAC address of your Kindle by navigating to _Settings_ → _Dev
 ![image](images/trmnl-byod-mac.png)
 
 ### 21. Download TRMNL KUAL Package
-Download your TRMNL KUAL package. Log into usetrmnl.com and find your Device ID by navigating to the top-right dropdown > clicking a device. Your Device ID will be in the URL, e.g. `1234`.
+Download your TRMNL KUAL package. Log into trmnl.com and find your Device ID by navigating to the top-right dropdown > clicking a device. Your Device ID will be in the URL, e.g. `1234`.
 
 Next, construct this URL and visit in a new tab:
 ```
-https://usetrmnl.com/devices/<device-id>/kindle/TRMNL_KINDLE.zip
+https://trmnl.com/devices/<device-id>/kindle/TRMNL_KINDLE.zip
 ```
 
 This will download a file, `TRMNL_KINDLE_<date>.zip`.
