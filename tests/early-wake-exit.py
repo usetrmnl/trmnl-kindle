@@ -347,7 +347,7 @@ suspend_write() { echo suspend; return 1; }
 go_to_sleep
 restore_trmnl
 echo finished
-''', fixtures, stderr='TRMNL: could not write exit-status.log\n'*3)
+''', fixtures, stderr='TRMNL: could not write exit-status.log\n'*4)
     assert 'suspend' in out and 'finished' in out and out.count('sync') == 2, out
     print('PASS unwritable durable log does not block suspend or cleanup')
 

@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
+DIR=$(dirname "$0")
+. "$DIR/utils.sh"
+exit_status() { :; }
 test_ip=$1
 
 if [ -z "$test_ip" ]; then
@@ -10,7 +13,7 @@ wait_for_wifi() {
   max_retry=30
   counter=0
 
-  ping -c 1 "$test_ip" >/dev/null 2>&1
+  run_with_timeout "$PING_TIMEOUT" ping -c 1 "$test_ip" >/dev/null 2>&1
 
   # shellcheck disable=SC2181
   while [ $? -ne 0 ]; do
@@ -18,7 +21,7 @@ wait_for_wifi() {
     counter=$((counter + 1))
 
     sleep 1
-    ping -c 1 "$test_ip" >/dev/null 2>&1
+    run_with_timeout "$PING_TIMEOUT" ping -c 1 "$test_ip" >/dev/null 2>&1
   done
 }
 

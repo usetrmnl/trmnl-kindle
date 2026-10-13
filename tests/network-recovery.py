@@ -5,12 +5,13 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 
 # Only device commands are faked; the production loop and readiness helper run.
 STUB = r'''#!/usr/bin/env python3
-import json, os, pathlib, sys
+import json, os, pathlib, sys, time
 p = pathlib.Path(os.environ['CASE_DIR'])
 name, args = pathlib.Path(sys.argv[0]).name, sys.argv[1:]
 state = json.loads((p/'state').read_text())
@@ -44,6 +45,11 @@ elif name == 'lipc-get-prop':
 elif name == 'lipc-set-prop' and args[-2] == 'wirelessEnable':
     state['wifi'] = int(args[-1]); save(); update_interface()
     event('wifi', state['wifi'])
+    stage_path = p/'last-stage'
+    stage = stage_path.read_text().strip() if stage_path.exists() else ''
+    if os.environ.get('HANG_RETRY_OFF') == '1' and state['wifi'] == 0 and stage == 'wifi-retry' and not state['hung_retry_off']:
+        state['hung_retry_off'] = True; save()
+        while True: time.sleep(1)
 elif name == 'eips':
     if args == ['-i']:
         print('smem_len: 16\nxres: 4 yres: 4\nbits_per_pixel: 8 grayscale: 1\nrotate: 0\n'
@@ -90,7 +96,7 @@ elif name == 'initctl' and args[0] == 'status':
 '''
 
 
-def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=False, failed_image=False):
+def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=False, failed_image=False, hang_retry_off=False):
     with tempfile.TemporaryDirectory() as directory:
         p = Path(directory)
         (p/'bin').mkdir()
@@ -98,7 +104,7 @@ def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=F
             path = p/'bin'/command
             path.write_text(STUB)
             path.chmod(0o755)
-        (p/'state').write_text(json.dumps(dict(cycle=0, retry=0, wifi=initial, empty_read=empty_read)))
+        (p/'state').write_text(json.dumps(dict(cycle=0, retry=0, wifi=initial, empty_read=empty_read, hung_retry_off=False)))
         if initial == 1 and plans[0][0] != 'bad':
             (p/'sys/class/net/wlan0').mkdir(parents=True)
         (p/'events').touch()
@@ -130,12 +136,23 @@ def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=F
             (p/filename).write_text(script)
         (p/'wait-for-wifi.sh').chmod(0o755)
         (p/'TRMNL_config.sh').write_text(
-            f'API_KEY=TEST_ONLY\nMIN_REFRESH_RATE=420\nWIFI_MANAGEMENT={policy}\nDEBUG_MODE={str(debug).lower()}\n')
-        env = dict(os.environ, PATH=str(p/'bin')+':'+os.environ['PATH'], CASE_DIR=str(p), PLANS=json.dumps(plans), FAILED_IMAGE=str(int(failed_image)))
+            f'API_KEY=TEST_ONLY\nMIN_REFRESH_RATE=420\nWIFI_MANAGEMENT={policy}\nDEBUG_MODE={str(debug).lower()}\n'
+            + ('LIPC_TIMEOUT=2\nEIPS_TIMEOUT=20\n' if hang_retry_off else ''))
+        env = dict(os.environ, PATH=str(p/'bin')+':'+os.environ['PATH'], CASE_DIR=str(p), PLANS=json.dumps(plans), FAILED_IMAGE=str(int(failed_image)), HANG_RETRY_OFF=str(int(hang_retry_off)))
+        started = time.monotonic()
         result = subprocess.run(['bash', './TRMNL.sh'], cwd=p, env=env, capture_output=True, text=True, timeout=30)
+        elapsed = time.monotonic() - started
         expected_stderr = ('TRMNL: exit confirmation unavailable (original state unavailable)\n'
                            'TRMNL: restoration incomplete (original state unavailable or restore failed)\n') if empty_read else ''
         assert result.returncode == 99 and result.stderr == expected_stderr, (name, result.returncode, result.stderr)
+        if hang_retry_off:
+            assert elapsed < 20, (name, elapsed)
+            assert json.loads((p/'state').read_text())['hung_retry_off'], name
+            log = (p/'exit-status.log').read_text()
+            assert log.count('timeout command=lipc-set-prop seconds=2') == 1, log
+            assert sum(' timeout command=' in line for line in log.splitlines()) == 1, log
+            assert 'retry reason=wifi-failed action=suspend' in log, log
+            assert (p/'last-stage').read_text() == 'suspend\n', name
         if empty_read:
             assert 'Tap anywhere' not in (p/'events').read_text(), 'capture failure offered exit'
         events = [json.loads(line) for line in (p/'events').read_text().splitlines()]
@@ -184,3 +201,4 @@ if __name__ == '__main__':
     run_case('debug failure retains upstream diagnostics', [['up'], ['bad', 'bad']], [900, 900], debug=True)
     run_case('unknown initial auto state keeps recovery and disables exit', [['bad', 'bad'], ['up']], [420, 900], policy=0, empty_read=True)
     run_case('failed nonempty download preserves last dashboard', [['up'], ['up'], ['up']], [900, 900, 900], failed_image=True)
+    run_case('timeout during activation retry', [['bad', 'bad']], [420], hang_retry_off=True)

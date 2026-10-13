@@ -5,10 +5,49 @@ readonly WIFI_AUTO=0
 readonly WIFI_ALWAYS_ON=1
 readonly WIFI_DISABLED_DURING_SLEEP=2
 
+LIPC_TIMEOUT=${LIPC_TIMEOUT:-10}
+EIPS_TIMEOUT=${EIPS_TIMEOUT:-15}
+PING_TIMEOUT=${PING_TIMEOUT:-5}
+METADATA_TIMEOUT=${METADATA_TIMEOUT:-30}
+IMAGE_TIMEOUT=${IMAGE_TIMEOUT:-60}
+
+# Some Kindle firmware omits the BusyBox timeout applet, and its two dialects
+# use incompatible arguments. For our TERM-only policy it just sends TERM
+# after a delay, so this shell version gives all supported Kindles one path.
+# Keep the watchdog's descriptors away from command-substitution pipes.
+# Cancelling it can leave its harmless sleep child alive until the budget ends.
+run_with_timeout() {
+  local seconds command_pid watchdog_pid status
+  seconds=$1
+  shift
+
+  "$@" &
+  command_pid=$!
+  (
+    trap - TERM INT HUP
+    /bin/sleep "$seconds"
+    kill -TERM "$command_pid" 2>/dev/null
+  ) </dev/null >/dev/null 2>&1 &
+  watchdog_pid=$!
+
+  wait "$command_pid" 2>/dev/null
+  status=$?
+  kill "$watchdog_pid" 2>/dev/null
+  wait "$watchdog_pid" 2>/dev/null
+  if [ "$status" -eq 143 ]; then
+    exit_status "timeout command=${1##*/} seconds=$seconds"
+  fi
+  return "$status"
+}
+
+set_stage() {
+  { printf '%s\n' "$1" >"$DIR/last-stage"; } 2>/dev/null || :
+}
+
 # ----------------------------- UTILITY FUNCTIONS -------------------------------- #
 get_kindle_battery() {
   # Run the command and capture its output
-  local result=$(lipc-get-prop com.lab126.powerd status)
+  local result=$(run_with_timeout "$LIPC_TIMEOUT" lipc-get-prop com.lab126.powerd status)
 
   # Extract the battery level using grep and cut
   # Find the line with "Battery Level", extract just the percentage number
@@ -67,9 +106,9 @@ select_exit_input() {
   EXIT_UNAVAILABLE_REASON=missing-reader-tools
   command -v awk >/dev/null || return 1
   EXIT_UNAVAILABLE_REASON=no-unambiguous-enabled-control
-  fsr=$(lipc-get-prop com.lab126.deviced fsrkeypadEnable 2>/dev/null) || fsr=
-  prev=$(lipc-get-prop com.lab126.deviced fsrkeypadPrevEnable 2>/dev/null) || prev=
-  next=$(lipc-get-prop com.lab126.deviced fsrkeypadNextEnable 2>/dev/null) || next=
+  fsr=$(run_with_timeout "$LIPC_TIMEOUT" lipc-get-prop com.lab126.deviced fsrkeypadEnable 2>/dev/null) || fsr=
+  prev=$(run_with_timeout "$LIPC_TIMEOUT" lipc-get-prop com.lab126.deviced fsrkeypadPrevEnable 2>/dev/null) || prev=
+  next=$(run_with_timeout "$LIPC_TIMEOUT" lipc-get-prop com.lab126.deviced fsrkeypadNextEnable 2>/dev/null) || next=
   selected=$(awk -v fsr="$fsr" -v prev="$prev" -v forward="$next" '
     # Kernel ARM32 bitmaps print 32-bit words, highest first.
     function bit(map, n, words, count, word, value, i) {
@@ -202,10 +241,10 @@ cache_displayed_image() {
 
 display_image() {
   # Older eips lacks image coordinates; retain the existing compatibility path.
-  if eips | grep -q -v '\-y'; then
-    eips -g "$1"
+  if run_with_timeout "$EIPS_TIMEOUT" eips | grep -q -v '\-y'; then
+    run_with_timeout "$EIPS_TIMEOUT" eips -g "$1"
   else
-    eips -g "$1" -x "$DISPLAY_X" -y "$DISPLAY_Y"
+    run_with_timeout "$EIPS_TIMEOUT" eips -g "$1" -x "$DISPLAY_X" -y "$DISPLAY_Y"
   fi
 }
 
@@ -218,6 +257,7 @@ offer_early_exit() {
     exit_status "ineligible $EXIT_UNAVAILABLE_REASON"
     return 0
   fi
+  set_stage exit-window
   exit_status 'window requested'
   if read_exit_input; then
     exit_status 'window confirmed'
@@ -300,8 +340,8 @@ capture_trmnl_state() {
   CAN_EXIT=1 RESTORE_INCOMPLETE=0 RESTORED=0
   FRAMEWORK_STOPPED=0 WEBREADER_STOPPED=0
   ORIGINAL_GOVERNOR=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null) || ORIGINAL_GOVERNOR=
-  ORIGINAL_WIFI=$(lipc-get-prop com.lab126.cmd wirelessEnable 2>/dev/null) || ORIGINAL_WIFI=
-  ORIGINAL_SCREENSAVER=$(lipc-get-prop com.lab126.powerd preventScreenSaver 2>/dev/null) || ORIGINAL_SCREENSAVER=
+  ORIGINAL_WIFI=$(run_with_timeout "$LIPC_TIMEOUT" lipc-get-prop com.lab126.cmd wirelessEnable 2>/dev/null) || ORIGINAL_WIFI=
+  ORIGINAL_SCREENSAVER=$(run_with_timeout "$LIPC_TIMEOUT" lipc-get-prop com.lab126.powerd preventScreenSaver 2>/dev/null) || ORIGINAL_SCREENSAVER=
   case "$ORIGINAL_GOVERNOR" in ''|*[!a-zA-Z0-9_-]*) ORIGINAL_GOVERNOR=; missing="$missing governor" ;; esac
   case "$ORIGINAL_WIFI" in 0|1) ;; *) ORIGINAL_WIFI=; missing="$missing wireless" ;; esac
   case "$ORIGINAL_SCREENSAVER" in ''|*[!0-9]*) ORIGINAL_SCREENSAVER=; missing="$missing screensaver" ;; esac
@@ -337,10 +377,10 @@ restore_trmnl() {
     echo "$ORIGINAL_GOVERNOR" >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor || { RESTORE_INCOMPLETE=1; exit_status 'cleanup failed governor'; }
   fi
   if [ -n "$ORIGINAL_WIFI" ]; then
-    lipc-set-prop com.lab126.cmd wirelessEnable "$ORIGINAL_WIFI" || { RESTORE_INCOMPLETE=1; exit_status 'cleanup failed wireless'; }
+    run_with_timeout "$LIPC_TIMEOUT" lipc-set-prop com.lab126.cmd wirelessEnable "$ORIGINAL_WIFI" || { RESTORE_INCOMPLETE=1; exit_status 'cleanup failed wireless'; }
   fi
   if [ -n "$ORIGINAL_SCREENSAVER" ]; then
-    lipc-set-prop com.lab126.powerd preventScreenSaver "$ORIGINAL_SCREENSAVER" || { RESTORE_INCOMPLETE=1; exit_status 'cleanup failed screensaver'; }
+    run_with_timeout "$LIPC_TIMEOUT" lipc-set-prop com.lab126.powerd preventScreenSaver "$ORIGINAL_SCREENSAVER" || { RESTORE_INCOMPLETE=1; exit_status 'cleanup failed screensaver'; }
   fi
   if [ "$FRAMEWORK_STOPPED" = 1 ]; then
     /etc/init.d/framework start || { RESTORE_INCOMPLETE=1; exit_status 'cleanup failed framework'; }
@@ -350,7 +390,7 @@ restore_trmnl() {
   fi
   if [ ! -x /etc/init.d/framework ] && [ "$FRAMEWORK_STATE" = running ]; then
     restore_stock_screen
-    lipc-set-prop com.lab126.appmgrd start app://com.lab126.booklet.home || { RESTORE_INCOMPLETE=1; exit_status 'cleanup failed home'; }
+    run_with_timeout "$LIPC_TIMEOUT" lipc-set-prop com.lab126.appmgrd start app://com.lab126.booklet.home || { RESTORE_INCOMPLETE=1; exit_status 'cleanup failed home'; }
   fi
   [ -z "$STOCK_SCREEN" ] || rm -f "$STOCK_SCREEN"
   if [ "$RESTORE_INCOMPLETE" = 0 ]; then

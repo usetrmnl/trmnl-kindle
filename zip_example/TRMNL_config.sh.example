@@ -32,3 +32,11 @@
 
 # Set to true to enable debug messages, false to disable
 # DEBUG_MODE=true
+
+# Timeout budgets are positive integer seconds; calibrate these starting values on hardware.
+# One TERM is sent when a budget expires.
+# LIPC_TIMEOUT=10
+# EIPS_TIMEOUT=15
+# PING_TIMEOUT=5
+# METADATA_TIMEOUT=30
+# IMAGE_TIMEOUT=60
