@@ -17,7 +17,12 @@ wait_for_wifi() {
 
   # shellcheck disable=SC2181
   while [ $? -ne 0 ]; do
-    [ $counter -eq $max_retry ] && echo "Couldn't connect to Wi-Fi" && exit 1
+    # Never chain exit after echo: under KUAL stdout is a dead pipe, echo fails,
+    # and a chained exit is skipped, so the loop would ping forever.
+    if [ $counter -ge $max_retry ]; then
+      echo "Couldn't connect to Wi-Fi"
+      exit 1
+    fi
     counter=$((counter + 1))
 
     sleep 1
@@ -27,3 +32,4 @@ wait_for_wifi() {
 
 wait_for_wifi
 echo "Wi-Fi connected"
+exit 0
