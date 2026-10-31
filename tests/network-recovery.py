@@ -67,7 +67,7 @@ elif name == 'test-suspend':
 '''
 
 
-def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=False):
+def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=False, closed_stdout=False):
     with tempfile.TemporaryDirectory() as directory:
         p = Path(directory)
         (p/'bin').mkdir()
@@ -106,7 +106,10 @@ def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=F
         (p/'TRMNL_config.sh').write_text(
             f'API_KEY=TEST_ONLY\nMIN_REFRESH_RATE=420\nWIFI_MANAGEMENT={policy}\nDEBUG_MODE={str(debug).lower()}\n')
         env = dict(os.environ, PATH=str(p/'bin')+':'+os.environ['PATH'], CASE_DIR=str(p), PLANS=json.dumps(plans))
-        result = subprocess.run(['bash', './TRMNL.sh'], cwd=p, env=env, capture_output=True, text=True, timeout=30)
+        # KUAL leaves the script with a dead stdout; a closed descriptor fails the same way.
+        # TRMNL.sh must redirect it first: the empty-stderr check below catches any write error.
+        command = ['bash', '-c', 'exec >&-; exec bash ./TRMNL.sh'] if closed_stdout else ['bash', './TRMNL.sh']
+        result = subprocess.run(command, cwd=p, env=env, capture_output=True, text=True, timeout=30)
         assert result.returncode == 99 and not result.stderr, (name, result.returncode, result.stderr)
         events = [json.loads(line) for line in (p/'events').read_text().splitlines()]
         for cycle, (plan, delay) in enumerate(zip(plans, delays)):
@@ -136,7 +139,26 @@ def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=F
         print('PASS', name)
 
 
+def run_wait_loop_case(name):
+    """The readiness helper must give up even when every stdout write fails."""
+    with tempfile.TemporaryDirectory() as directory:
+        p = Path(directory)
+        (p/'bin').mkdir()
+        for command, body in [('ping', 'echo ping >>attempts; exit 1'), ('sleep', 'exit 0')]:
+            (p/'bin'/command).write_text(f'#!/bin/sh\n{body}\n')
+            (p/'bin'/command).chmod(0o755)
+        (p/'wait-for-wifi.sh').write_text((ROOT/'zip_example/wait-for-wifi.sh').read_text())
+        env = dict(os.environ, PATH=str(p/'bin')+':'+os.environ['PATH'])
+        result = subprocess.run(['bash', '-c', 'exec >&-; exec bash ./wait-for-wifi.sh 10.255.255.1'],
+                                cwd=p, env=env, capture_output=True, text=True, timeout=20)
+        assert result.returncode == 1, (name, result.returncode, result.stderr)
+        assert (p/'attempts').read_text().count('ping') == 31, name  # max_retry + 1, then give up
+        print('PASS', name)
+
+
 if __name__ == '__main__':
+    run_wait_loop_case('readiness helper gives up with dead stdout')
+    run_case('failure then next-wake recovery with dead stdout', [['bad', 'bad'], ['up']], [420, 900], closed_stdout=True)
     run_case('failure then next-wake recovery', [['bad', 'bad'], ['up']], [420, 900])
     run_case('one retry recovers', [['bad', 'up']], [900])
     run_case('filtered ICMP', [['icmp', 'icmp']], [900])
