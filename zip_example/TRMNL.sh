@@ -1,4 +1,8 @@
 #!/bin/sh
+# KUAL starts this script with stdout on a pipe nobody reads, so every write
+# to it fails. Send it to /dev/null unless a terminal is attached (so file
+# redirects are discarded too; use a tty to see output).
+[ -t 1 ] || exec >/dev/null
 source ./utils.sh
 
 ###############################################################################
