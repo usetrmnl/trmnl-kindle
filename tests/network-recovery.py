@@ -36,7 +36,8 @@ elif name == 'lipc-get-prop':
         else: print(state['wifi'])
     elif args[-1] == 'status': print('Battery Level: 50%')
 elif name == 'lipc-set-prop' and args[-2] == 'wirelessEnable':
-    state['wifi'] = int(args[-1]); save(); update_interface()
+    state['wifi'] = int(args[-1]); save()
+    if not (state['wifi'] == 0 and state.get('linger')): update_interface()
     event('wifi', state['wifi'])
 elif name == 'eips':
     if args == ['-i']: print('xres: 600 yres: 800')
@@ -44,8 +45,10 @@ elif name == 'eips':
     # Native eips on the tested Kindle rejects !: character not available.
     elif args == ['0', '0', '!']: sys.exit(1)
     else:
-        if args[0] == '-g':
-            assert pathlib.Path(args[1]).is_file(), 'display image missing'
+        if '-g' in args:
+            assert pathlib.Path(args[args.index('-g')+1]).is_file(), 'display image missing'
+        if '-f' in args and state.get('draw_fails'):
+            state['draw_fails'] -= 1; save(); event('screen-failed', *args); sys.exit(1)
         event('screen', *args)
 elif name == 'curl':
     assert state['wifi'] == 1 and interface.exists(), 'fetch without network'
@@ -56,19 +59,24 @@ elif name == 'curl':
         print('{"image_url":"https://example.invalid/image","filename":"display.png","refresh_rate":900}')
 elif name == 'sleep':
     event('sleep', int(args[0]))
+    if args == ['1'] and state.get('linger'):
+        state['linger'] -= 1; save()
+        if not state['linger']: update_interface()
     if args == ['20']:
         state['retry'] += 1; save()
         assert state['retry'] == 1, 'more than one activation retry'
 elif name == 'test-suspend':
     alarm = next(p.glob('sys/class/rtc/rtc*/wakealarm'))
     event('suspend', alarm.read_text().strip(), state['wifi'])
+    event('wlan0-at-suspend', interface.exists())
     state['cycle'] += 1; state['retry'] = 0; save()
     if state['cycle'] == len(plans): sys.exit(99)
     update_interface()
 '''
 
 
-def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=False, closed_stdout=False, rtc='rtc1'):
+def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=False, closed_stdout=False, rtc='rtc1',
+             linger=0, draw_fails=0):
     with tempfile.TemporaryDirectory() as directory:
         p = Path(directory)
         (p/'bin').mkdir()
@@ -76,7 +84,7 @@ def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=F
             path = p/'bin'/command
             path.write_text(STUB)
             path.chmod(0o755)
-        (p/'state').write_text(json.dumps(dict(cycle=0, retry=0, wifi=initial, empty_read=empty_read)))
+        (p/'state').write_text(json.dumps(dict(cycle=0, retry=0, wifi=initial, empty_read=empty_read, linger=linger, draw_fails=draw_fails)))
         if initial == 1 and plans[0][0] != 'bad':
             (p/'sys/class/net/wlan0').mkdir(parents=True)
         (p/'events').touch()
@@ -117,6 +125,9 @@ def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=F
             actual = [e[1:] for e in events if e[0] == cycle]
             failed = plan[-1] == 'bad'
             assert [e[1] for e in actual if e[0] == 'suspend'] == [f'+{delay}'], (name, actual)
+            # With the radio turned off for sleep, suspend waits (up to 20 s) for wlan0 to go.
+            if actual[-2][-1] == 0 and linger <= 20:
+                assert actual[-1] == ['wlan0-at-suspend', False], (name, actual)
             assert actual.count(['sleep', 20]) == (1 if plan[0] == 'bad' else 0), (name, actual)
             if plan[0] == 'bad':
                 retry = actual.index(['sleep', 20])
@@ -133,8 +144,12 @@ def run_case(name, plans, delays, policy=2, initial=1, debug=False, empty_read=F
                 assert actual[-1][-1] == 0, (name, actual)  # failed attempts sleep with radio off
             else:
                 assert ['screen', '-g', './wifi-error.png'] not in screens, (name, screens)
-                assert ['screen', '-c'] in screens and any(e[1] == '-g' for e in screens), (name, screens)
-                assert screens.index(['screen', '-c']) < next(i for i, e in enumerate(screens) if e[1] == '-g')
+                # Drawn over the old image with a full refresh; never cleared to blank first.
+                # (Debug mode still clears once at the start of each cycle, before its text.)
+                assert screens.count(['screen', '-c']) == (1 if debug else 0), (name, screens)
+                assert sum(1 for e in screens if e[1:3] == ['-f', '-g']) == 1, (name, screens)
+                fails = [e for e in actual if e[0] == 'screen-failed']
+                assert len(fails) == (draw_fails if cycle == 0 else 0), (name, actual)
                 policy_state = (0 if empty_read else initial) if policy == 0 else int(policy == 1)
                 assert actual[-1][-1] == policy_state, (name, actual)
         print('PASS', name)
@@ -169,3 +184,5 @@ if __name__ == '__main__':
     run_case('debug failure retains upstream diagnostics', [['up'], ['bad', 'bad']], [900, 900], debug=True)
     run_case('unknown initial auto state sleeps with Wi-Fi off', [['up']], [900], policy=0, empty_read=True)
     run_case('wake alarm on rtc0 (11th gen Kindle)', [['up'], ['up']], [900, 900], rtc='rtc0')
+    run_case('suspend waits for wlan0 to go (Voyage Wi-Fi chip)', [['up'], ['up']], [900, 900], policy=1, initial=0, linger=6)
+    run_case('failed draw is retried once', [['up'], ['up']], [900, 900], draw_fails=1)
