@@ -57,6 +57,12 @@ if [ -e ./TRMNL_config.sh ]; then
   source ./TRMNL_config.sh
 fi
 
+# SLEEP_MODE=powerd: let the Kindle's power manager own suspend (see TRMNL_powerd.sh).
+# Needed on the Paperwhite 4, whose Wi-Fi didn't survive this script's own suspend.
+if [ "$SLEEP_MODE" = powerd ]; then
+  exec /bin/sh "$(dirname "$0")/TRMNL_powerd.sh"
+fi
+
 # IP or domain used to test if network is up (without the protocol, port or
 # path)
 WIFI_TEST_ADDRESS=${WIFI_TEST_ADDRESS:-$(echo "$BASE_URL" | cut -d/ -f3 | cut -d: -f1)}

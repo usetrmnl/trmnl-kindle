@@ -237,6 +237,15 @@ You may see an error, such as `Fetching JSON... error.. Retry in 60s.` This like
 
 <kdb><img src="https://github.com/usetrmnl/trmnl-kindle/blob/main/images/kindle-json-fetch-error.jpeg" width="650px"></kdb>
 
+**Dashboard stops refreshing on battery (e.g. Paperwhite 4)**
+If refreshes work while the Kindle is plugged in but stop on battery (Wi-Fi never reconnects after it wakes), let the Kindle's own power manager handle sleep. Add this to `TRMNL_config.sh` and start TRMNL again:
+
+```sh
+SLEEP_MODE=powerd
+```
+
+In this mode, pressing the power button refreshes the dashboard straight away. To get the normal Kindle back, use **Stop TRMNL** in KUAL, or restart the Kindle. Tested on the Paperwhite 4 (10th gen) on firmware 5.13.5 and 5.16.7. A log is kept in `TRMNL_KINDLE/trmnl.log`.
+
 ## Next steps
 
 Our team is working to accommodate multiple Kindle device frame dimensions, open source more the TRMNL_KINDLE jailbreak logic for easy extension, and handle Kindle device "sleep" screens + redraws.
