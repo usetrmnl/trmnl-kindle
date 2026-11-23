@@ -32,3 +32,12 @@
 
 # Set to true to enable debug messages, false to disable
 # DEBUG_MODE=true
+
+# Let the Kindle's power manager handle sleep instead of this script (see
+# TRMNL_powerd.sh). Use it if the dashboard stops refreshing on battery, as on the
+# Paperwhite 4 (10th gen). Pressing the power button then refreshes the dashboard.
+# SLEEP_MODE=powerd
+
+# powerd mode only: 1 (default) stops the Kindle UI, like the normal mode; 0 keeps it
+# running (the home screen then shows briefly at each refresh).
+# STOP_UI=1
