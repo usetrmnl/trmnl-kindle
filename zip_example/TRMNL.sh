@@ -129,6 +129,16 @@ go_to_sleep() {
 
   # Allow time to abort the script and finish refreshing the screen.
   sleep 10
+  # Don't suspend while the Wi-Fi chip is still powering down. On the Voyage (AR6003),
+  # a suspend that lands mid power-down leaves the driver unable to power the chip on
+  # again ("could not enable wifi chip" in dmesg) until a reboot. Wait up to 20 s more.
+  if [ "$INITIAL_WIFI_STATE" != 1 ]; then
+    WAITED=0
+    while [ -e /sys/class/net/wlan0 ] && [ "$WAITED" -lt 20 ]; do
+      sleep 1
+      WAITED=$((WAITED + 1))
+    done
+  fi
   # The wake alarm is rtc1 on most models but rtc0 on others (e.g. the 11th gen
   # Kindle). Suspend only if the alarm write succeeds. Without an alarm, the Kindle
   # sleeps until the power button. If any step fails, sleep for the interval instead.
@@ -178,7 +188,7 @@ while true; do
   # 2) Fetch JSON metadata
   BATTERY_PERCENT=$(get_kindle_battery)
   RESPONSE="$(
-    curl -sL \
+    curl -sL -m 60 \
       -H "access-token: $API_KEY" \
       -H "percent-charged: ${BATTERY_PERCENT}" \
       -H "png-width: $PNG_WIDTH" \
@@ -246,7 +256,7 @@ while true; do
   eips_debug "Downloading image..."
 
   # Download the image directly from IMAGE_URL
-  curl -sL -o "$IMAGE_PATH" \
+  curl -sL -m 120 -o "$IMAGE_PATH" \
     -A "$USER_AGENT" \
     "$IMAGE_URL"
 
@@ -259,20 +269,26 @@ while true; do
   fi
 
   eips_debug "Image downloaded OK."
-  eips_debug "Clearing screen to show image..."
+  eips_debug "Drawing image..."
 
   # 5) Display the downloaded image
-  # Always clear screen before showing the image
-  eips -c
-  sleep 1
-  # eips on particular old Kindles (e.g. Kindle 4) does not support -x -y for
-  # image display (-g). Try to naively detect this by checking for -y existence
-  # in the usage strings
-  if eips | grep -q -v "\-y" ; then
-    eips_debug "Using compatiblity mode for image plotting"
-    eips -g "$IMAGE_PATH"
-  else
-    eips -g "$IMAGE_PATH" -x "$DISPLAY_X" -y "$DISPLAY_Y"
+  # Draw over the previous image with a full refresh (-f) instead of clearing first:
+  # if a draw fails, the old image stays up instead of a blank screen. Retry once.
+  draw_image() {
+    # eips on particular old Kindles (e.g. Kindle 4) does not support -x -y for
+    # image display (-g). Try to naively detect this by checking for -y existence
+    # in the usage strings
+    if eips | grep -q -v "\-y" ; then
+      eips_debug "Using compatiblity mode for image plotting"
+      eips -f -g "$IMAGE_PATH"
+    else
+      eips -f -g "$IMAGE_PATH" -x "$DISPLAY_X" -y "$DISPLAY_Y"
+    fi
+  }
+  if ! draw_image; then
+    eips_debug "Error: drawing the image failed, retrying"
+    sleep 2
+    draw_image
   fi
 
   # 6) Print full URL & filename below the displayed image only if debug mode is on
